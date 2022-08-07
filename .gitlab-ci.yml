@@ -23,7 +23,7 @@ linting:
   extends: build
   stage: linting
   script:
-    - npm run ling
+    - npm run lint
   tags:
     - artic
 

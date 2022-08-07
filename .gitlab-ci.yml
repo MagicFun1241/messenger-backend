@@ -16,23 +16,32 @@ build:
     key: npm
     paths:
       - .npm/
+  tags:
+    - artic
 
 linting:
   extends: build
   stage: linting
   script:
     - npm run ling
+  tags:
+    - artic
 
 tests:
   extends: build
   stage: tests
   script:
     - npm run test
+  tags:
+    - artic
+
 
 deploy-staging:
   stage: deploy-staging
   script:
     - docker-compose -f docker-compose.staging.yml up --build -d
+  tags:
+    - artic
   only:
     - staging
 
@@ -40,5 +49,7 @@ deploy-production:
   stage: deploy-production
   script:
     - docker-compose -f docker-compose.production.yml up --build -d
+  tags:
+    - artic
   only:
     - main

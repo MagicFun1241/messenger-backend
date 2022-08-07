@@ -16,6 +16,9 @@ build:
     key: npm
     paths:
       - .npm/
+  artifacts:
+    paths:
+      - node_modules/
   tags:
     - artic
 

@@ -1,0 +1,44 @@
+stages:
+  - build
+  - linting
+  - tests
+  - deploy-staging
+  - deploy-production
+
+build:
+  stage: build
+  image: node:18.4.0
+  script:
+    - npm i -g @nestjs/cli
+    - npm ci --cache .npm --prefer-offline
+    - npm run build
+  cache:
+    key: npm
+    paths:
+      - .npm/
+
+linting:
+  extends: build
+  stage: linting
+  script:
+    - npm run ling
+
+tests:
+  extends: build
+  stage: tests
+  script:
+    - npm run test
+
+deploy-staging:
+  stage: deploy-staging
+  script:
+    - docker-compose -f docker-compose.staging.yml up --build -d
+  only:
+    - staging
+
+deploy-production:
+  stage: deploy-production
+  script:
+    - docker-compose -f docker-compose.production.yml up --build -d
+  only:
+    - main

@@ -24,7 +24,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        NODE_ENV: staging
+        ENV: staging
     container_name: messenger-backend-staging
     restart: always
     networks:

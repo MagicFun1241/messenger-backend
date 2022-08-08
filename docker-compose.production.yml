@@ -24,7 +24,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        NODE_ENV: production
+        ENV: production
     container_name: messenger-backend-production
     restart: always
     networks:

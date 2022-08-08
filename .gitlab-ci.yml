@@ -30,7 +30,7 @@ linting:
   tags:
     - artic
 
-tests:
+unit-tests:
   extends: build
   stage: tests
   script:

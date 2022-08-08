@@ -48,6 +48,4 @@ networks:
     external: true
   messenger-network-production:
     name: messenger-network-production
-    external: true
-
 

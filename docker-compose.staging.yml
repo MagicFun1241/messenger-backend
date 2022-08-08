@@ -48,5 +48,4 @@ networks:
     external: true
   messenger-network-staging:
     name: messenger-network-staging
-    external: true
 

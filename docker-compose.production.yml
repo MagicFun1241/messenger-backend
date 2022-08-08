@@ -9,7 +9,7 @@ services:
       - 27017
     networks:
       - default
-      - messenger-network
+      - messenger-network-production
     volumes:
       - ~/mongodb-production:/data/db
     environment:
@@ -29,7 +29,7 @@ services:
     restart: always
     networks:
       - default
-      - messenger-network
+      - messenger-network-production
     expose:
       - 3000
     ports:
@@ -44,8 +44,10 @@ volumes:
     driver: local
 networks:
   default:
+    name: containers-controller_default
     external: true
-  messenger-network:
+  messenger-network-production:
+    name: messenger-network-production
     external: true
 
 

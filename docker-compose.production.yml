@@ -6,7 +6,7 @@ services:
     container_name: messenger-mongodb-production
     restart: always
     ports:
-      - 27017
+      - 27017:27017
     networks:
       - default
       - messenger-network-production
@@ -31,9 +31,9 @@ services:
       - default
       - messenger-network-production
     expose:
-      - 3000
+      - 3000:3000
     ports:
-      - 3000
+      - 3000:3000
 #    volumes:
 #      - "./config.json:/app/config.json"
 #      - "./data:/app/storage"
@@ -48,4 +48,4 @@ networks:
     external: true
   messenger-network-production:
     name: messenger-network-production
-
+    driver: bridge

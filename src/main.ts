@@ -3,6 +3,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { Logger } from '@nestjs/common';
 import { WsAdapter } from 'nestjs-ws-binary-adapter';
 import * as fs from 'fs';
 import { AppModule } from '@/app.module';
@@ -20,6 +21,8 @@ async function bootstrap() {
       https: httpsOptions,
     }),
   );
+
+  Logger.warn(`ENV: ${process.env.NODE_ENV}`);
 
   app.useWebSocketAdapter(new WsAdapter(app));
 

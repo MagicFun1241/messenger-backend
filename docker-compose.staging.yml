@@ -6,7 +6,7 @@ services:
     container_name: messenger-mongodb-staging
     restart: always
     ports:
-      - 27017
+      - "27017:27017"
     networks:
       - default
       - messenger-network-staging
@@ -38,7 +38,7 @@ services:
 #      - "./config.json:/app/config.json"
 #      - "./data:/app/storage"
     depends_on:
-      - "mongodb"
+      - mongodb
 volumes:
   messenger-mongodb-staging:
     driver: local

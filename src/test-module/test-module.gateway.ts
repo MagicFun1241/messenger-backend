@@ -2,7 +2,9 @@ import { WebSocketGateway, SubscribeMessage, MessageBody } from '@nestjs/websock
 import { TestModule } from '@/test-module/schemas/test-module.schema';
 import { TestModuleService } from '@/test-module/test-module.service';
 
-@WebSocketGateway()
+@WebSocketGateway(8080, {
+  cors: true,
+})
 export class TestModuleGateway {
   constructor(private readonly testModuleService: TestModuleService) {}
 

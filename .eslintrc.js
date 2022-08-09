@@ -32,7 +32,7 @@ module.exports = {
       },
       typescript: {
         alwaysTryTypes: true,
-        project: './tsconfig.json',
+        project: 'tsconfig.json',
       },
       alias: {
         map: [['@/*', 'src/*']],

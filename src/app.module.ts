@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TestModuleModule } from '@/test-module/test-module.module';
@@ -11,15 +11,20 @@ import { TestModuleModule } from '@/test-module/test-module.module';
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        uri: 'mongodb://'
-            + `${String(configService.get('MONGO_USER'))}:`
-            + `${String(configService.get('MONGO_PASSWORD'))}@`
-            + `${String(configService.get('MONGO_HOST'))}:`
-            + `${String(configService.get('MONGO_PORT'))}/${
-              String(configService.get('MONGO_DATABASE'))
-            }?readPreference=primary`,
-      }),
+      useFactory: async (configService: ConfigService) => {
+        const uri = 'mongodb://'
+          + `${String(configService.get('MONGO_USER'))}:`
+          + `${String(configService.get('MONGO_PASSWORD'))}@`
+          + `${String(configService.get('MONGO_HOST'))}:`
+          + `${String(configService.get('MONGO_PORT'))}/${
+            String(configService.get('MONGO_DATABASE'))
+          }?readPreference=primary`;
+
+        Logger.log(`DB URI: ${uri}`);
+        return {
+          uri,
+        };
+      },
       inject: [ConfigService],
     }),
     TestModuleModule,

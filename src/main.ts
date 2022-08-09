@@ -14,6 +14,8 @@ async function bootstrap() {
     cert: fs.readFileSync(`${process.cwd()}/tools/mkcert/cert.pem`),
   } : undefined;
 
+  Logger.log(`Process ENV: ${process.env.NODE_ENV}`);
+
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter({
@@ -21,8 +23,6 @@ async function bootstrap() {
       https: httpsOptions,
     }),
   );
-
-  Logger.warn(`ENV: ${process.env.NODE_ENV}`);
 
   app.useWebSocketAdapter(new WsAdapter(app));
 

@@ -6,7 +6,7 @@ services:
     container_name: messenger-mongodb-production
     restart: always
     ports:
-      - "27017:27017"
+      - "27017"
     networks:
       - default
       - messenger-network-production
@@ -30,10 +30,8 @@ services:
     networks:
       - default
       - messenger-network-production
-    expose:
-      - 3000
     ports:
-      - 3000:3000
+      - "80"
 #    volumes:
 #      - "./config.json:/app/config.json"
 #      - "./data:/app/storage"

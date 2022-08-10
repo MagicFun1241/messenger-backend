@@ -8,7 +8,6 @@ services:
     ports:
       - "27017"
     networks:
-      - default
       - messenger-network-production
     volumes:
       - ~/messenger-mongodb-production:/data/db

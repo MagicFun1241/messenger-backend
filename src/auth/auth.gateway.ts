@@ -1,6 +1,6 @@
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 
-@WebSocketGateway()
+@WebSocketGateway(8080, { cors: true })
 export class AuthGateway {
   @SubscribeMessage('message')
   handleMessage(client: any, payload: any): string {

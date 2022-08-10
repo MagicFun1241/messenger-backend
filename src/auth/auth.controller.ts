@@ -7,7 +7,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post()
-  login(@Body() createAuthDto: CreateAuthDto) {
+  externalLogin(@Body() createAuthDto: CreateAuthDto) {
     return [];
   }
 }

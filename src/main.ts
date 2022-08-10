@@ -14,7 +14,7 @@ async function bootstrap() {
     cert: fs.readFileSync(`${process.cwd()}/tools/mkcert/cert.pem`),
   } : undefined;
 
-  Logger.log(`Process ENV: ${process.env.NODE_ENV}`);
+  Logger.log(`Process ENV: ${process.env.NODE_ENV}`, 'ENV');
 
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,

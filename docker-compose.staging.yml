@@ -8,7 +8,6 @@ services:
     ports:
       - "27017"
     networks:
-      - default
       - messenger-network-staging
     volumes:
       - ~/messenger-mongodb-staging:/data/db

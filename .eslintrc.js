@@ -48,5 +48,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     'import/prefer-default-export': 'off',
     '@typescript-eslint/require-await': 'off',
+    'max-len': ['error', { 'code': 120 }],
   },
 };

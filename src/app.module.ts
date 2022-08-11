@@ -15,11 +15,11 @@ import { AuthModule } from './auth/auth.module';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
         const uri = 'mongodb://'
-          + `${String(configService.get('MONGO_USER'))}:`
-          + `${String(configService.get('MONGO_PASSWORD'))}@`
-          + `${String(configService.get('MONGO_HOST'))}:`
-          + `${String(configService.get('MONGO_PORT'))}/${
-            String(configService.get('MONGO_DATABASE'))
+          + `${configService.get<string>('MONGO_USER')}:`
+          + `${configService.get<string>('MONGO_PASSWORD')}@`
+          + `${configService.get<string>('MONGO_HOST')}:`
+          + `${configService.get<string>('MONGO_PORT')}/${
+            configService.get<string>('MONGO_DATABASE')
           }?readPreference=primary`;
 
         Logger.log(`DB URI: ${uri}`);

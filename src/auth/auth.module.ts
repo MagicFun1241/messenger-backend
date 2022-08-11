@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { AuthGateway } from '@/auth/auth.gateway';
 import { MongooseModule } from '@nestjs/mongoose';
-import { TokenExternal, TokenExternalSchema } from '@/auth/schemas/token-external.schema';
-import { Session, SessionSchema } from '@/auth/schemas/session.schema';
+import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '@/users/users.module';
+import { TokenExternal, TokenExternalSchema } from './schemas/token-external.schema';
+import { Session, SessionSchema } from './schemas/session.schema';
+import { AuthGateway } from './auth.gateway';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
@@ -20,6 +21,7 @@ import { AuthService } from './auth.service';
         schema: SessionSchema,
       },
     ]),
+    JwtModule,
     UsersModule,
   ],
   controllers: [AuthController],

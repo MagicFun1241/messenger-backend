@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
@@ -12,13 +12,24 @@ export class UsersService {
     return this.UserModel.findById(userId).exec();
   }
 
-  findByExternalId(externalId: number): Promise<User> {
-    return this.UserModel.findOne({ externalId }).exec();
+  async findByExternalId(externalId: number): Promise<(UserDocument & { _id: Types.ObjectId }) | null> {
+    const user = await this.UserModel.findOne({ externalId }).exec();
+    return user;
   }
 
-  create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<UserDocument & { _id: Types.ObjectId }> {
     const newUser = new this.UserModel(createUserDto);
     newUser.userName = 'int1m';
-    return newUser.save();
+    await newUser.save();
+    return newUser;
+  }
+
+  async findByExternalIdOrCreate(createUserDto: CreateUserDto): Promise<UserDocument & { _id: Types.ObjectId }> {
+    const user = await this.findByExternalId(createUserDto.externalId);
+    if (user) {
+      return user;
+    }
+    const newUser = await this.create(createUserDto);
+    return newUser;
   }
 }

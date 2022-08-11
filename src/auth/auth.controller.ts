@@ -8,11 +8,12 @@ import { CreateTokenExternalDto } from './dto/create-token-external.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post()
-  externalLogin(
+  @Post('external-login')
+  async externalLogin(
   @Ip() ip: string,
     @Body() createTokenExternalDto: CreateTokenExternalDto,
   ) {
+    await this.authService.create(ip, createTokenExternalDto);
     return [];
   }
 }

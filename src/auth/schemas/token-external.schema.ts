@@ -1,12 +1,12 @@
-import mongoose from 'mongoose';
+import { Schema as MongooseSchema, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 export type TokenExternalDocument = TokenExternal & Document;
 
 @Schema({ timestamps: true })
 export class TokenExternal {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true })
-    user: number;
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User', required: true })
+    user: Types.ObjectId;
 
   @Prop({ required: true })
     token: string;

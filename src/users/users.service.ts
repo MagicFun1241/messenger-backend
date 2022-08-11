@@ -19,7 +19,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument & { _id: Types.ObjectId }> {
     const newUser = new this.UserModel(createUserDto);
-    newUser.userName = 'int1m';
+    newUser.userName = `user${newUser._id.toString()}`;
     await newUser.save();
     return newUser;
   }

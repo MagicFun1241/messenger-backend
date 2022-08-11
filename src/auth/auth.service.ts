@@ -22,12 +22,6 @@ export class AuthService {
     private userService: UsersService,
   ) {}
 
-  // findOneTokenExternal(tokenId: number): Promise<TokenExternal | undefined> {
-  //   return new Promise((resolve) => {
-  //     resolve(this.tokensExternal.find((token) => token.id === tokenId));
-  //   });
-  // }
-
   private async createOrFindNewUserByToken(token: string): Promise<UserDocument & { _id: Types.ObjectId }> {
     if (this.jwtService.verify(token, { secret: this.configService.get<string>('TOKEN_EXTERNAL_SECRET') })) {
       const decodedToken = this.jwtService.decode(token) as CreateUserDto;
@@ -37,9 +31,11 @@ export class AuthService {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  async create(ip: string, createTokenExternalDto: CreateTokenExternalDto): Promise<TokenExternal> {
+  async create(createTokenExternalDto: CreateTokenExternalDto): Promise<TokenExternal> {
     const user = await this.createOrFindNewUserByToken(createTokenExternalDto.token);
-    const newTokenExternal = new this.TokenExternalModel({ token: createTokenExternalDto.token, ip });
+    const newTokenExternal = new this.TokenExternalModel(
+      { token: createTokenExternalDto.token, ip: createTokenExternalDto.ip },
+    );
     newTokenExternal.user = user._id;
     await newTokenExternal.save();
     return newTokenExternal;

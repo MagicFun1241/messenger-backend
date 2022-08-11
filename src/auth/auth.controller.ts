@@ -1,5 +1,5 @@
 import {
-  Controller, Post, Body, Ip,
+  Controller, Post, Body,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateTokenExternalDto } from './dto/create-token-external.dto';
@@ -10,10 +10,11 @@ export class AuthController {
 
   @Post('external-login')
   async externalLogin(
-  @Ip() ip: string,
     @Body() createTokenExternalDto: CreateTokenExternalDto,
-  ) {
-    await this.authService.create(ip, createTokenExternalDto);
-    return [];
+  ): Promise<{ status: boolean }> {
+    await this.authService.create(createTokenExternalDto);
+    return {
+      status: true,
+    };
   }
 }

@@ -16,18 +16,17 @@ import { WsModule } from './ws/ws.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const uri = 'mongodb://'
-          + `${configService.get<string>('MONGO_USER')}:`
-          + `${configService.get<string>('MONGO_PASSWORD')}@`
-          + `${configService.get<string>('MONGO_HOST')}:`
-          + `${configService.get<string>('MONGO_PORT')}/${
-            configService.get<string>('MONGO_DATABASE')
-          }?readPreference=primary`;
+        const containsUserCredentials = configService.get('MONGO_USER') != null
+          && configService.get('MONGO_PASSWORD') != null;
+
+        const uri = `mongodb://${
+          containsUserCredentials
+            ? `${configService.get<string>('MONGO_USER')}:${configService.get<string>('MONGO_PASSWORD')}` : ''
+          // eslint-disable-next-line max-len
+        }@${configService.get<string>('MONGO_HOST')}/${configService.get<string>('MONGO_DATABASE')}?readPreference=primary`;
 
         Logger.log(`DB URI: ${uri}`);
-        return {
-          uri,
-        };
+        return uri;
       },
       inject: [ConfigService],
     }),

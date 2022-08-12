@@ -33,7 +33,7 @@
     "@nestjs/platform-fastify": "^9.0.8",
     "@nestjs/websockets": "^9.0.8",
     "@types/ws": "^8.5.3",
-    "class-transformer": "^0.5.1",
+    "ioredis": "^5.2.2",
     "mongoose": "^6.5.1",
     "msgpackr": "^1.6.2",
     "nestjs-ws-binary-adapter": "^9.0.8",

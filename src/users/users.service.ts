@@ -1,35 +1,50 @@
-import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
+import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument } from './schemas/user.schema';
-import { CreateUserDto } from './dto/create-user.dto';
+import { User, UserDocument } from '@/users/schemas/user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private UserModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+  ) {}
 
-  findById(userId: number): Promise<User> {
-    return this.UserModel.findById(userId).exec();
+  findOne(userId: string): Promise<UserDocument> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        resolve(await this.userModel.findById(userId).exec());
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 
-  async findByExternalId(externalId: number): Promise<(UserDocument & { _id: Types.ObjectId }) | null> {
-    const user = await this.UserModel.findOne({ externalId }).exec();
-    return user;
+  search(query: string): Promise<User[]> {
+    return new Promise<User[]>(async (resolve, reject) => {
+      try {
+        resolve(await this.userModel.aggregate([
+          {
+            $addFields: {
+              fullName: { $concat: ['$firstName', '$lastName', '$userName'] },
+            },
+          },
+          {
+            $search: { fullName: query },
+          },
+        ]));
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 
-  async create(createUserDto: CreateUserDto): Promise<UserDocument & { _id: Types.ObjectId }> {
-    const newUser = new this.UserModel(createUserDto);
-    newUser.userName = `user${newUser._id.toString()}`;
-    await newUser.save();
-    return newUser;
-  }
+  delete(userId: string): Promise<void> {
+    return new Promise(async (resolve) => {
+      await this.userModel.deleteOne({
+        _id: userId,
+      });
 
-  async findByExternalIdOrCreate(createUserDto: CreateUserDto): Promise<UserDocument & { _id: Types.ObjectId }> {
-    const user = await this.findByExternalId(createUserDto.externalId);
-    if (user) {
-      return user;
-    }
-    const newUser = await this.create(createUserDto);
-    return newUser;
+      resolve();
+    });
   }
 }

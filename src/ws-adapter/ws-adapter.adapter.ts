@@ -150,17 +150,17 @@ export class WsAdapter extends AbstractWsAdapter {
     return server;
   }
 
-  bindClientConnect(server: any, callback: Function) {
-    super.bindClientConnect(server, callback);
-    server.on(CONNECTION_EVENT, (ws: any) => {
-      this.logger.log('CONNECTED');
-
-      ws.on(CLOSE_EVENT, () => {
-        this.logger.log('CLOSE EVENT');
-        ws.removeAllListeners(CLOSE_EVENT);
-      });
-    });
-  }
+  // bindClientConnect(server: any, callback: Function) {
+  //   super.bindClientConnect(server, callback);
+  //   server.on(CONNECTION_EVENT, (ws: any, req: any, client: unknown) => {
+  //     // ws.headers = req.headers;
+  //
+  //     ws.on(CLOSE_EVENT, () => {
+  //       this.logger.log('CLOSED');
+  //       ws.removeAllListeners(CLOSE_EVENT);
+  //     });
+  //   });
+  // }
 
   public bindClientDisconnect(client: any, callback: Function) {
     client.on(CLOSE_EVENT, callback);

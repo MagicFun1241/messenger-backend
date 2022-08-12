@@ -5,11 +5,13 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { WebSocket } from 'ws';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
 import { UserDocument } from '@/users/schemas/user.schema';
 import { UsersService } from '@/users/users.service';
 import { TokenExternal, TokenExternalDocument } from './schemas/token-external.schema';
 import { CreateTokenExternalDto } from './dto/create-token-external.dto';
+import { WebSocketAuthEntity } from './entities/web-socket-auth.entity';
 
 @Injectable()
 export class AuthService {
@@ -39,5 +41,9 @@ export class AuthService {
     newTokenExternal.user = user._id;
     await newTokenExternal.save();
     return newTokenExternal;
+  }
+
+  static setAuthTokenToConnection(client: WebSocketAuthEntity, jwtToken: string) {
+    client.auth = jwtToken;
   }
 }

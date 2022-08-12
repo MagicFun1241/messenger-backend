@@ -3,5 +3,6 @@ import { WsAdapterService } from './ws-adapter.service';
 
 @Module({
   providers: [WsAdapterService],
+  exports: [WsAdapterService],
 })
 export class WsAdapterModule {}

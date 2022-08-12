@@ -7,6 +7,7 @@ import { Session, SessionSchema } from './schemas/session.schema';
 import { AuthGateway } from './auth.gateway';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AuthService } from './auth.service';
     UsersModule,
   ],
   controllers: [AuthController],
-  providers: [AuthGateway, AuthService],
+  providers: [AuthGateway, AuthWsJwtGuard, AuthService],
+  exports: [AuthWsJwtGuard],
 })
 export class AuthModule {}

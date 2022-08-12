@@ -49,6 +49,7 @@ module.exports = {
     'import/prefer-default-export': 'off',
     '@typescript-eslint/require-await': 'off',
     'max-len': ['error', { 'code': 120 }],
-    'no-underscore-dangle': ['error', { 'allow': ['_id'] }]
+    'no-underscore-dangle': ['error', { 'allow': ['_id'] }],
+    'no-param-reassign': ['error', { 'props': false }],
   },
 };

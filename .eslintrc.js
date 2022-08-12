@@ -49,11 +49,11 @@ module.exports = {
     '@typescript-eslint/no-unsafe-argument': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
     '@typescript-eslint/no-unsafe-assignment': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
     'import/prefer-default-export': 'off',
     'no-promise-executor-return': 'off',
     'no-async-promise-executor': 'off',
     'consistent-return': 'off',
-    'no-underscore-dangle': 'off',
     '@typescript-eslint/require-await': 'off',
     'max-len': ['error', { 'code': 120 }],
     'no-underscore-dangle': ['error', { 'allow': ['_id'] }]

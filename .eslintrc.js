@@ -55,5 +55,7 @@ module.exports = {
     'consistent-return': 'off',
     'no-underscore-dangle': 'off',
     '@typescript-eslint/require-await': 'off',
+    'max-len': ['error', { 'code': 120 }],
+    'no-underscore-dangle': ['error', { 'allow': ['_id'] }]
   },
 };

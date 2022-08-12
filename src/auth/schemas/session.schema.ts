@@ -4,22 +4,22 @@ import { User } from '@/users/schemas/user.schema';
 
 export type SessionDocument = Session & Document;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Session {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
     user: User;
 
-  @Prop()
+  @Prop({ required: true })
     accessToken: string;
 
-  @Prop()
+  @Prop({ required: true })
     refreshToken: string;
 
-  @Prop()
+  @Prop({ required: true })
     lastIp: string;
 
-  @Prop()
-    lastLoginDateTime: Date;
+  @Prop({ required: true, default: Date.now })
+    lastActivityDateTime: Date;
 }
 
 export const SessionSchema = SchemaFactory.createForClass(Session);

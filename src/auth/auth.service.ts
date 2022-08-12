@@ -1,37 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-
-export type TokenExternal = {
-  id: number,
-  userId: number,
-  token: string,
-  ip: string,
-  createAt: Date,
-};
+import { Model, Types } from 'mongoose';
+import {
+  HttpException, HttpStatus, Injectable, Logger,
+} from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+import { CreateUserDto } from '@/users/dto/create-user.dto';
+import { UserDocument } from '@/users/schemas/user.schema';
+import { UsersService } from '@/users/users.service';
+import { TokenExternal, TokenExternalDocument } from './schemas/token-external.schema';
+import { CreateTokenExternalDto } from './dto/create-token-external.dto';
 
 @Injectable()
 export class AuthService {
-  private tokensExternal: TokenExternal[] = [
-    {
-      id: 1,
-      userId: 1,
-      token: 'fDFSF9SF9SFMKbvbvdf242gxvvhhgfd',
-      ip: '160.60.150.155',
-      createAt: new Date(),
-    },
-    {
-      id: 2,
-      userId: 2,
-      token: 'gfgfh9DMkkfkdf09dfdlo20ifg',
-      ip: '124.210.44.150',
-      createAt: new Date(),
-    },
-  ];
+  private readonly logger = new Logger(AuthService.name);
 
-  findOneTokenExternal(tokenId: number): Promise<TokenExternal | undefined> {
-    return new Promise((resolve) => {
-      resolve(this.tokensExternal.find((token) => token.id === tokenId));
-    });
+  constructor(
+    @InjectModel(TokenExternal.name) private TokenExternalModel: Model<TokenExternalDocument>,
+    private configService: ConfigService,
+    private jwtService: JwtService,
+    private userService: UsersService,
+  ) {}
+
+  private async createOrFindNewUserByToken(token: string): Promise<UserDocument & { _id: Types.ObjectId }> {
+    if (this.jwtService.verify(token, { secret: this.configService.get<string>('TOKEN_EXTERNAL_SECRET') })) {
+      const decodedToken = this.jwtService.decode(token) as CreateUserDto;
+      const user = await this.userService.findByExternalIdOrCreate(decodedToken);
+      return user;
+    }
+    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+  }
+
+  async create(createTokenExternalDto: CreateTokenExternalDto): Promise<TokenExternal> {
+    const user = await this.createOrFindNewUserByToken(createTokenExternalDto.token);
+    const newTokenExternal = new this.TokenExternalModel(
+      { token: createTokenExternalDto.token, ip: createTokenExternalDto.ip },
+    );
+    newTokenExternal.user = user._id;
+    await newTokenExternal.save();
+    return newTokenExternal;
   }
 }

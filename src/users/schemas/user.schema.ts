@@ -1,6 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
+
+export interface ExternalAccount {
+  service: string;
+  payload: any;
+}
 
 @Schema()
 export class User {
@@ -22,8 +28,8 @@ export class User {
   @Prop({ required: true })
     dateOfBirth: Date;
 
-  @Prop({ required: true })
-    externalId: number;
+  @Prop()
+    externalAccounts: Array<ExternalAccount>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

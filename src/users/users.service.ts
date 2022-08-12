@@ -1,37 +1,50 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-
-export type User = {
-  id: number,
-  name: string,
-  surname: string,
-  username: string,
-  externalId: number,
-};
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from '@/users/schemas/user.schema';
 
 @Injectable()
 export class UsersService {
-  private readonly users: User[] = [
-    {
-      id: 1,
-      name: 'Maxim',
-      surname: 'Mostovoy',
-      username: 'int1m',
-      externalId: 1,
-    },
-    {
-      id: 2,
-      name: 'Ivan',
-      surname: 'Ivanov',
-      username: 'ivanov321',
-      externalId: 2,
-    },
-  ];
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+  ) {}
 
-  findOne(userId: number): Promise<User | undefined> {
-    return new Promise((resolve) => {
-      resolve(this.users.find((user) => user.id === userId));
+  findOne(userId: string): Promise<UserDocument> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        resolve(await this.userModel.findById(userId).exec());
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  search(query: string): Promise<User[]> {
+    return new Promise<User[]>(async (resolve, reject) => {
+      try {
+        resolve(await this.userModel.aggregate([
+          {
+            $addFields: {
+              fullName: { $concat: ['$firstName', '$lastName', '$userName'] },
+            },
+          },
+          {
+            $search: { fullName: query },
+          },
+        ]));
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  delete(userId: string): Promise<void> {
+    return new Promise(async (resolve) => {
+      await this.userModel.deleteOne({
+        _id: userId,
+      });
+
+      resolve();
     });
   }
 }

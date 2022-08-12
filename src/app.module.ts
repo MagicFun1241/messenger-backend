@@ -1,6 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import * as mongoose from 'mongoose';
 import { WsAdapterModule } from './ws-adapter/ws-adapter.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
@@ -14,18 +15,11 @@ import { AuthModule } from './auth/auth.module';
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {
-        const uri = 'mongodb://'
-          + `${String(configService.get('MONGO_USER'))}:`
-          + `${String(configService.get('MONGO_PASSWORD'))}@`
-          + `${String(configService.get('MONGO_HOST'))}:`
-          + `${String(configService.get('MONGO_PORT'))}/${
-            String(configService.get('MONGO_DATABASE'))
-          }?readPreference=primary`;
+        const containsUserCredentials = configService.get('MONGO_USER') != null && configService.get('MONGO_PASSWORD') != null;
+        const uri = `mongodb://${containsUserCredentials ? `${String(configService.get('MONGO_USER'))}:${String(configService.get('MONGO_PASSWORD'))}` : ''}@${String(configService.get('MONGO_HOST'))}/${String(configService.get('MONGO_DATABASE'))}?readPreference=primary`;
 
         Logger.log(`DB URI: ${uri}`);
-        return {
-          uri,
-        };
+        return uri;
       },
       inject: [ConfigService],
     }),

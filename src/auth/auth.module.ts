@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '@/users/users.module';
+import { WsModule } from '@/ws/ws.module';
 import { TokenExternal, TokenExternalSchema } from './schemas/token-external.schema';
 import { Session, SessionSchema } from './schemas/session.schema';
 import { AuthGateway } from './auth.gateway';
@@ -24,6 +25,7 @@ import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
     ]),
     JwtModule,
     UsersModule,
+    WsModule,
   ],
   controllers: [AuthController],
   providers: [AuthGateway, AuthWsJwtGuard, AuthService],

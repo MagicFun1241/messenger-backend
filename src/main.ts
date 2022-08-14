@@ -4,9 +4,10 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { Logger } from '@nestjs/common';
-import { WsAdapter } from '@/ws-adapter/ws-adapter.adapter';
+import { WsAdapter } from 'nestjs-ws-binary-adapter';
 import * as fs from 'fs';
 import { AppModule } from '@/app.module';
+import { WSValidationPipe } from '@/@global/WsValidationPipe';
 
 async function bootstrap() {
   const httpsOptions = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined ? {
@@ -25,6 +26,8 @@ async function bootstrap() {
   );
 
   app.useWebSocketAdapter(new WsAdapter(app));
+
+  app.useGlobalPipes(new WSValidationPipe());
 
   await app.listen(3000);
 }

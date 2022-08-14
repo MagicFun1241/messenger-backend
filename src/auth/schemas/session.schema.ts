@@ -1,19 +1,16 @@
-import * as mongoose from 'mongoose';
+import { Types, Document } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { User } from '@/users/schemas/user.schema';
+import { Timestamps } from '@/@types/mongoose';
 
-export type SessionDocument = Session & Document;
+export type SessionDocument = Session & Document<string> & Timestamps;
 
 @Schema({ timestamps: true })
 export class Session {
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-    user: User;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+    userId: string;
 
   @Prop({ required: true })
-    accessToken: string;
-
-  @Prop({ required: true })
-    refreshToken: string;
+    token: string;
 
   @Prop({ required: true })
     lastIp: string;

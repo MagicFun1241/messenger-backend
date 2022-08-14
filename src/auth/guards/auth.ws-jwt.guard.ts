@@ -1,27 +1,33 @@
 import { Reflector } from '@nestjs/core';
 import {
-  CanActivate, ExecutionContext, Injectable, Logger,
+  CanActivate, ExecutionContext, Injectable,
 } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '@/auth/auth.service';
-import { Observable } from 'rxjs';
-import { WebSocketAuthEntity } from '@/auth/entities/web-socket-auth.entity';
-import { WsFormatException } from '@/ws/exceptions/ws-format.exception';
+import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
+import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthWsJwtGuard implements CanActivate {
-  private readonly logger = new Logger(AuthWsJwtGuard.name);
-
   constructor(
     private readonly authService: AuthService,
-    private reflector: Reflector,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
+    private readonly reflector: Reflector,
   ) {}
 
-  canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
-    const client = context.switchToWs().getClient<WebSocketAuthEntity>();
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const client = context.switchToWs().getClient<WebSocketEntity>();
     const event = this.reflector.get<string>('ws-message', context.getHandler());
-    if (client.auth === '1234') {
+
+    if (await this.jwtService.verifyAsync(
+      client.tokenAccess,
+      { secret: this.configService.get<string>('TOKEN_ACCESS_SECRET') },
+    )) {
       return true;
     }
+
     throw new WsFormatException({
       event,
       code: 3401,

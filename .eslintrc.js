@@ -46,17 +46,12 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/no-unsafe-argument': 'off',
-    '@typescript-eslint/no-misused-promises': 'off',
-    '@typescript-eslint/no-unsafe-assignment': 'off',
-    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/require-await': 'off', // для использования .forRootAsync
+
     'import/prefer-default-export': 'off',
-    'no-promise-executor-return': 'off',
-    'no-async-promise-executor': 'off',
-    'consistent-return': 'off',
-    '@typescript-eslint/require-await': 'off',
     'max-len': ['error', { 'code': 120 }],
-    'no-underscore-dangle': ['error', { 'allow': ['_id'] }],
-    'no-param-reassign': ['error', { 'props': false }],
+    'no-underscore-dangle': ['error', { 'allow': ['_id'] }], // разрешает использование нижнего подчеркивания для id, нужно для mongo
+    'no-param-reassign': ['error', { 'props': false }], // разрешает мутацию пропсов объекта
+    'class-methods-use-this': 'off', // разрешает создание методов без использования this, нужно для controllers & gateways
   },
 };

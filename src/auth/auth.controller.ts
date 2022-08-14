@@ -8,13 +8,13 @@ import { CreateTokenExternalDto } from './dto/create-token-external.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Post('external-login')
+  @Post('create-token-external')
   async externalLogin(
     @Body() createTokenExternalDto: CreateTokenExternalDto,
-  ): Promise<{ status: boolean }> {
-    await this.authService.create(createTokenExternalDto);
+  ): Promise<{ tokenExternal: string }> {
+    const tokenExternal = await this.authService.createTokenExternal(createTokenExternalDto);
     return {
-      status: true,
+      tokenExternal,
     };
   }
 }

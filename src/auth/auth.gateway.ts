@@ -1,30 +1,56 @@
-import { UseFilters, UseGuards } from '@nestjs/common';
+import { Logger, UseFilters, UseGuards } from '@nestjs/common';
 import {
-  ConnectedSocket,
+  ConnectedSocket, MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WsResponse,
+  OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { WebSocket } from 'ws';
-import { WsFilterException } from '@/ws/exceptions/ws-filter.exception';
-import { MessageMetaData } from '@/ws/ws-message-meta-data.decorator';
+import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
+import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
+import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { AuthService } from './auth.service';
 import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
-import { WebSocketAuthEntity } from './entities/web-socket-auth.entity';
+import { AuthTokenExternalDto } from './dto/auth.token-external.dto';
 
-@WebSocketGateway(8081, { cors: true })
-export class AuthGateway {
+@WebSocketGateway(8080, { cors: true })
+export class AuthGateway implements OnGatewayDisconnect {
+  private readonly logger = new Logger(AuthGateway.name);
+
   constructor(
     private readonly authService: AuthService,
   ) {}
 
+  @UseFilters(WsFilterException)
+  @SubscribeMessage('get-access-token')
+  async getAccessTokenHandler(
+    @MessageBody() messageBody: AuthTokenExternalDto,
+      @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<WsResponse<unknown>> {
+    const accessToken = await this.authService.createSession(
+      messageBody.tokenExternal,
+      client.remoteAddress,
+      'get-access-token',
+    );
+    return {
+      event: 'get-access-token',
+      data: {
+        accessToken,
+      },
+    };
+  }
+
+  @UseFilters(WsFilterException)
   @SubscribeMessage('auth')
-  authHandler(@ConnectedSocket() client: WebSocket): WsResponse<unknown> {
-    AuthService.setAuthTokenToConnection((client as WebSocketAuthEntity), '1234');
+  async authHandler(
+    @MessageBody() messageBody: AuthTokenExternalDto,
+      @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<WsResponse<{ status: boolean }>> {
+    const result = await this.authService.setTokenAccessToConnection(client, messageBody.tokenExternal);
     return {
       event: 'auth',
       data: {
-        status: true,
+        status: result,
       },
     };
   }
@@ -40,5 +66,9 @@ export class AuthGateway {
         test: 'okay!',
       },
     };
+  }
+
+  handleDisconnect(@ConnectedSocket() client: WebSocketEntity) {
+    this.authService.deleteConnectionFromState(client);
   }
 }

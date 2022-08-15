@@ -5,10 +5,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '@/users/users.module';
 import { WsModule } from '@/ws/ws.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { AuthenticationGateway } from './auth.gateway';
+import { AuthenticationGateway } from './authentication.gateway';
 import { TokenExternal } from './schemas/token-external.schema';
 import { Session } from './schemas/session.schema';
-import { AuthenticationService } from './auth.service';
+import { AuthenticationService } from './authentication.service';
 
 describe('AuthGateway', () => {
   let gateway: AuthenticationGateway;

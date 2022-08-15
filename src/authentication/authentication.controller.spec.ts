@@ -5,8 +5,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '@/users/users.module';
 import { WsModule } from '@/ws/ws.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { AuthenticationController } from './authenticationController';
-import { AuthenticationService } from './auth.service';
+import { AuthenticationController } from './authentication.controller';
+import { AuthenticationService } from './authentication.service';
 import { TokenExternal } from './schemas/token-external.schema';
 import { Session } from './schemas/session.schema';
 

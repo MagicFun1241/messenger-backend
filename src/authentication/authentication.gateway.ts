@@ -9,7 +9,7 @@ import {
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
 import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
-import { AuthenticationService } from './auth.service';
+import { AuthenticationService } from './authentication.service';
 import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
 import { AuthTokenExternalDto } from './dto/auth.token-external.dto';
 

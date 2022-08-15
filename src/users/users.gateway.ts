@@ -27,8 +27,6 @@ export class UsersGateway {
 
   @SubscribeMessage('findMe')
   async findMe(): Promise<PickOnly<UserDocument, 'firstName' | 'lastName' | 'photo'>> {
-    return new Promise(async resolve => {
-
-    });
+    return null;
   }
 }

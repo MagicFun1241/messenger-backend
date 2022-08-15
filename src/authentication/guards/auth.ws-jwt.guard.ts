@@ -3,7 +3,7 @@ import {
   CanActivate, ExecutionContext, Injectable,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { AuthService } from '@/auth/auth.service';
+import { AuthenticationService } from '@/authentication/authentication.service';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { ConfigService } from '@nestjs/config';
@@ -11,7 +11,7 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthWsJwtGuard implements CanActivate {
   constructor(
-    private readonly authService: AuthService,
+    private readonly authService: AuthenticationService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly reflector: Reflector,

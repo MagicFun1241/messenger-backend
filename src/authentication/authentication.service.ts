@@ -16,8 +16,8 @@ import { Session, SessionDocument } from './schemas/session.schema';
 import { CreateTokenExternalDto } from './dto/create-token-external.dto';
 
 @Injectable()
-export class AuthService {
-  private readonly logger = new Logger(AuthService.name);
+export class AuthenticationService {
+  private readonly logger = new Logger(AuthenticationService.name);
 
   constructor(
     @InjectModel(TokenExternal.name) private readonly TokenExternalModel: Model<TokenExternalDocument>,
@@ -97,12 +97,12 @@ export class AuthService {
       expiresIn: this.configService.get<string>('TOKEN_ACCESS_EXPIRATION'),
     });
 
-    const newSession = await (new this.SessionModel({
+    const newSession = await this.SessionModel.create({
       userId: externalTokenModel.userId,
       token: tokenAccess,
       lastIp: ip,
       lastActivityDateTime: new Date(),
-    })).save();
+    });
 
     await externalTokenModel.delete();
 

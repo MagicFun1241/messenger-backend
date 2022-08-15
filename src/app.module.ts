@@ -1,8 +1,9 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { RedisModule } from 'nestjs-redis';
 import { UsersModule } from './users/users.module';
-import { AuthModule } from './auth/auth.module';
+import { AuthenticationModule } from './authentication/authentication.module';
 import { WsModule } from './ws/ws.module';
 
 @Module({
@@ -29,8 +30,20 @@ import { WsModule } from './ws/ws.module';
       },
       inject: [ConfigService],
     }),
+    RedisModule.forRootAsync({
+      useFactory: (configService: ConfigService) => {
+        const port = configService.get<string>('REDIS_PORT');
+        return {
+          host: configService.get<string>('REDIS_HOST'),
+          port: port == null ? undefined : parseInt(port, 10),
+          username: configService.get<string>('REDIS_USER'),
+          password: configService.get<string>('REDIS_PASSWORD'),
+        };
+      },
+      inject: [ConfigService],
+    }),
     UsersModule,
-    AuthModule,
+    AuthenticationModule,
     WsModule,
   ],
   controllers: [],

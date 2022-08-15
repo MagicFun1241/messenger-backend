@@ -47,6 +47,8 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/require-await': 'off', // для использования .forRootAsync
+    '@typescript-eslint/no-unsafe-return': 'off', // для дополнений
+    '@typescript-eslint/no-unsafe-assignment': 'off', // тоже для дополнений
 
     'import/prefer-default-export': 'off',
     'max-len': ['error', { 'code': 120 }],

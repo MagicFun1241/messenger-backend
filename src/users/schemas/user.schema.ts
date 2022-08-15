@@ -13,6 +13,9 @@ export class User {
     lastName: string;
 
   @Prop()
+    photo?: string;
+
+  @Prop()
     middleName: string;
 
   @Prop({ required: true, unique: true })

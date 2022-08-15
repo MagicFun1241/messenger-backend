@@ -9,16 +9,16 @@ import {
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
 import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
-import { AuthService } from './auth.service';
+import { AuthenticationService } from './auth.service';
 import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
 import { AuthTokenExternalDto } from './dto/auth.token-external.dto';
 
 @WebSocketGateway(8080, { cors: true })
-export class AuthGateway implements OnGatewayDisconnect {
-  private readonly logger = new Logger(AuthGateway.name);
+export class AuthenticationGateway implements OnGatewayDisconnect {
+  private readonly logger = new Logger(AuthenticationGateway.name);
 
   constructor(
-    private readonly authService: AuthService,
+    private readonly authService: AuthenticationService,
   ) {}
 
   @UseFilters(WsFilterException)

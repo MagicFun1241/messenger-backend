@@ -5,9 +5,9 @@ import { UsersModule } from '@/users/users.module';
 import { WsModule } from '@/ws/ws.module';
 import { TokenExternal, TokenExternalSchema } from './schemas/token-external.schema';
 import { Session, SessionSchema } from './schemas/session.schema';
-import { AuthGateway } from './auth.gateway';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthenticationGateway } from './authentication.gateway';
+import { AuthenticationController } from './authentication.controller';
+import { AuthenticationService } from './authentication.service';
 import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
 
 @Module({
@@ -27,8 +27,8 @@ import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
     UsersModule,
     WsModule,
   ],
-  controllers: [AuthController],
-  providers: [AuthGateway, AuthWsJwtGuard, AuthService],
+  controllers: [AuthenticationController],
+  providers: [AuthenticationGateway, AuthWsJwtGuard, AuthenticationService],
   exports: [AuthWsJwtGuard],
 })
-export class AuthModule {}
+export class AuthenticationModule {}

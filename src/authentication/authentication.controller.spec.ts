@@ -5,13 +5,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '@/users/users.module';
 import { WsModule } from '@/ws/ws.module';
 import { MongoMemoryServer } from 'mongodb-memory-server';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthenticationController } from './authenticationController';
+import { AuthenticationService } from './auth.service';
 import { TokenExternal } from './schemas/token-external.schema';
 import { Session } from './schemas/session.schema';
 
 describe('AuthController', () => {
-  let controller: AuthController;
+  let controller: AuthenticationController;
   let mongoServer: MongoMemoryServer;
 
   beforeEach(async () => {
@@ -28,15 +28,15 @@ describe('AuthController', () => {
         UsersModule,
         WsModule,
       ],
-      controllers: [AuthController],
+      controllers: [AuthenticationController],
       providers: [
-        AuthService,
+        AuthenticationService,
         { provide: getModelToken(TokenExternal.name), useValue: TokenExternal },
         { provide: getModelToken(Session.name), useValue: Session },
       ],
     }).compile();
 
-    controller = module.get<AuthController>(AuthController);
+    controller = module.get<AuthenticationController>(AuthenticationController);
   });
 
   afterEach(async () => {

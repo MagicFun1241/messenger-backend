@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Param, Post,
+  Body, Controller, Logger, Param, Post,
 } from '@nestjs/common';
 
 import Interpreter from 'sval';
@@ -17,12 +17,22 @@ interface ServiceInstance {
 
 interface AuthenticationServiceCallbackContext {
   body: any;
+  database: {
+    externalTokens: {
+      insert: (doc) => void;
+    };
+  };
+
+  status: (n: number) => void;
+  send: (d: any) => void;
 }
 
 type AuthenticationServiceCallback = (ctx: AuthenticationServiceCallbackContext) => any;
 
 @Controller('authentication')
 export class AuthenticationController {
+  private readonly logger = new Logger(AuthenticationController.name);
+
   private registeredServices = new Map<string, {
     dependencies: Array<string>;
     callback: AuthenticationServiceCallback;
@@ -38,33 +48,35 @@ export class AuthenticationController {
             ecmaVer: 9,
           });
 
-          const customConsole = console;
+          const customConsole = this.logger;
           ['log', 'warn', 'error'].forEach((key) => {
             customConsole[key] = () => {
               // eslint-disable-next-line @typescript-eslint/no-unsafe-call,prefer-rest-params
-              console[key](`[AuthenticationService ${p}]`, ...arguments);
+              this.logger[key](`[${p}]`, ...arguments);
             };
           });
 
-          interpreter.import({
-            console: customConsole,
-            services: {
-              register: (name: string, callback: AuthenticationServiceCallback): ServiceInstance => {
-                const dependencies = [];
-                return {
-                  dependencies,
-                  run: () => {
-                    if (this.registeredServices.has(name)) return;
+          const globalObject: { [name: string]: any; } = {};
+          globalObject.console = customConsole;
 
-                    this.registeredServices.set(name, {
-                      callback,
-                      dependencies,
-                    });
-                  },
-                };
-              },
+          globalObject.services = {
+            register: (name: string, callback: AuthenticationServiceCallback): ServiceInstance => {
+              const dependencies = [];
+              return {
+                dependencies,
+                run: () => {
+                  if (this.registeredServices.has(name)) return;
+
+                  this.registeredServices.set(name, {
+                    callback,
+                    dependencies,
+                  });
+                },
+              };
             },
-          });
+          };
+
+          interpreter.import(globalObject);
 
           try {
             interpreter.run(readFileSync(path.join(inputDir, p), { encoding: 'utf-8' }));

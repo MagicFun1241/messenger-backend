@@ -1,5 +1,5 @@
 import {
-  Body, Controller, Logger, Param, Post,
+  Body, Controller, HttpException, HttpStatus, Logger, Param, Post,
 } from '@nestjs/common';
 
 import Interpreter from 'sval';
@@ -22,9 +22,6 @@ interface AuthenticationServiceCallbackContext {
       insert: (doc) => void;
     };
   };
-
-  status: (n: number) => void;
-  send: (d: any) => void;
 }
 
 type AuthenticationServiceCallback = (ctx: AuthenticationServiceCallbackContext) => any;
@@ -59,6 +56,8 @@ export class AuthenticationController {
           const globalObject: { [name: string]: any; } = {};
           globalObject.console = customConsole;
 
+          globalObject.HttpException = HttpException;
+
           globalObject.services = {
             register: (name: string, callback: AuthenticationServiceCallback): ServiceInstance => {
               const dependencies = [];
@@ -87,13 +86,13 @@ export class AuthenticationController {
       });
       // eslint-disable-next-line no-empty
     } catch (e) {
-      console.error(e);
+      this.logger.error(e);
     }
 
     this.registeredServices.forEach((service, serviceName) => {
       service.dependencies.forEach((dep) => {
         if (!this.registeredServices.has(dep)) {
-          console.error(`No "${dep}" dependency for "${serviceName}" service`);
+          this.logger.error(`No "${dep}" dependency for "${serviceName}" service`);
 
           this.registeredServices.delete(serviceName);
         }
@@ -105,11 +104,17 @@ export class AuthenticationController {
   async usingService(@Param('name') name: string, @Body() body: any): Promise<any> {
     const service = this.registeredServices.get(name);
     if (service == null) {
-      return null;
+      throw new HttpException('Authorization service not found', HttpStatus.NOT_FOUND);
     }
 
     return service.callback({
       body,
+      database: {
+        externalTokens: {
+          insert(p1) {
+          },
+        },
+      },
     });
   }
 

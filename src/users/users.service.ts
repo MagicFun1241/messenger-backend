@@ -37,7 +37,6 @@ export class UsersService {
       return user;
     }
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-
     const newUser = await this.create(createUserDto);
     return newUser;
   }

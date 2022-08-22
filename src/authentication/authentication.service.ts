@@ -13,7 +13,6 @@ import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { TokenExternal, TokenExternalDocument } from './schemas/token-external.schema';
 import { Session, SessionDocument } from './schemas/session.schema';
-import { CreateTokenExternalDto } from './dto/create-token-external.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -28,12 +27,22 @@ export class AuthenticationService {
     private readonly wsService: WsService,
   ) {}
 
-  private async findTokenExternalModelByTokenAndIp(
-    tokenExternal: string,
-    ip: string,
-  ): Promise<TokenExternalDocument | null> {
-    const tokenExternalModel = await this.TokenExternalModel.findOne({ token: tokenExternal, ip }).exec();
+  async findTokenExternalModelByPayload(payload: any, additional: any = {}): Promise<TokenExternalDocument | null> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const tokenExternalModel = await this.TokenExternalModel.findOne({
+      ...additional,
+      payload,
+    }).exec();
+
     return tokenExternalModel;
+  }
+
+  decodeJwt(token: string) {
+    return this.jwtService.decode(token);
+  }
+
+  verifyJwt(token: string, secret: string) {
+    return this.jwtService.verify(token, { secret });
   }
 
   private async createOrFindNewUserByToken(tokenExternal: string): Promise<UserDocument> {
@@ -42,20 +51,27 @@ export class AuthenticationService {
       { secret: this.configService.get<string>('TOKEN_EXTERNAL_SECRET') },
     )) {
       const tokenExternalDecoded = this.jwtService.decode(tokenExternal) as CreateUserDto;
-      const user = await this.userService.findByExternalIdOrCreate(tokenExternalDecoded);
+      const user = await this.userService.findByExternalIdOrCreate('volsu', tokenExternalDecoded);
       return user;
     }
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  async createTokenExternal(createTokenExternalDto: CreateTokenExternalDto): Promise<string> {
+  async createTokenExternal(createTokenExternalDto: any): Promise<string> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument
     const user = await this.createOrFindNewUserByToken(createTokenExternalDto.token);
-    const newTokenExternal = await (new this.TokenExternalModel({
+    const newTokenExternal = await this.TokenExternalModel.create({
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       token: createTokenExternalDto.token,
-      ip: createTokenExternalDto.ip,
+      payload: {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        ip: createTokenExternalDto.ip,
+      },
       userId: user._id,
-    })).save();
-    return newTokenExternal.token;
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    return newTokenExternal.payload.token;
   }
 
   private async validatingTokenExternal(
@@ -67,7 +83,7 @@ export class AuthenticationService {
       tokenExternal,
       { secret: this.configService.get<string>('TOKEN_EXTERNAL_SECRET') },
     )) {
-      const externalTokenModel = await this.findTokenExternalModelByTokenAndIp(tokenExternal, ip);
+      const externalTokenModel = await this.findTokenExternalModelByPayload({ ip, token: tokenExternal });
       if (!externalTokenModel) {
         throw new WsFormatException({
           event,

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { TokenExternal, TokenExternalDocument } from '@/authentication/schemas/token-external.schema';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 
@@ -8,6 +9,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersService {
   constructor(
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
+    @InjectModel(TokenExternal.name) private tokenExternal: Model<TokenExternalDocument>,
   ) {}
 
   async findOne(userId: string): Promise<UserDocument | null> {
@@ -22,16 +24,19 @@ export class UsersService {
     return newUser;
   }
 
-  async findByExternalId(externalId: number): Promise<UserDocument | null> {
-    const user = await this.UserModel.findOne({ externalId }).exec();
+  async findByExternalId(service: string, externalId: number): Promise<UserDocument | null> {
+    const t = await this.tokenExternal.findOne({ service, externalId }, { userId: 1 }).exec();
+    const user = await this.UserModel.findById(t.userId);
     return user;
   }
 
-  async findByExternalIdOrCreate(createUserDto: CreateUserDto): Promise<UserDocument> {
-    const user = await this.findByExternalId(createUserDto.externalId);
+  async findByExternalIdOrCreate(service: string, createUserDto: any): Promise<UserDocument> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
+    const user = await this.findByExternalId(service, createUserDto.externalId);
     if (user) {
       return user;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const newUser = await this.create(createUserDto);
     return newUser;
   }

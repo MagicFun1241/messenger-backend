@@ -10,10 +10,13 @@ export class TokenExternal {
     userId: string;
 
   @Prop({ required: true })
-    token: string;
+    externalId: any;
 
   @Prop({ required: true })
-    ip: string;
+    service: string;
+
+  @Prop()
+    payload: any;
 }
 
 export const TokenExternalSchema = SchemaFactory.createForClass(TokenExternal);

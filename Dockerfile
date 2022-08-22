@@ -1,5 +1,5 @@
 # Base project configuration
-FROM node:18.4.0 as build
+FROM node:18.7.0-buster as build
 
 RUN npm i -g @nestjs/cli
 

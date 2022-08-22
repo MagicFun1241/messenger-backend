@@ -41,6 +41,17 @@ module.exports = {
     },
   },
   ignorePatterns: ['.eslintrc.js'],
+  overrides: [
+    {
+      files: ['test/**', '.*\\.spec\\.ts$'],
+      plugins: ['jest'],
+      rules: {
+        // Выключаем правило unbound-method в тестах
+        '@typescript-eslint/unbound-method': 'off',
+        'jest/unbound-method': 'error',
+      },
+    },
+  ],
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',

@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: bitnami/mongodb:latest
+    container_name: messenger-mongodb-staging
+    restart: always
+    networks:
+      - messenger-network-staging
+    volumes:
+      - ~/messenger-mongodb-staging:/data/db
+    environment:
+      MONGODB_ROOT_USERNAME: root
+      MONGODB_ROOT_PASSWORD: GVf9fk99DKiodklps,mvixivxg
+      MONGODB_USERNAME: user-messenger
+      MONGODB_PASSWORD: 9mkffg4sdidkIFIMFOkmfk
+      MONGODB_DATABASE: messenger
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: staging
+    container_name: messenger-backend-staging
+    restart: always
+    networks:
+      - default
+      - messenger-network-staging
+    ports:
+      - "3000"
+    depends_on:
+      - mongodb
+volumes:
+  messenger-mongodb-staging:
+    driver: local
+networks:
+  default:
+    name: containers-controller_default
+    external: true
+  messenger-network-staging:
+    name: messenger-network-staging
+    driver: bridge

@@ -1,0 +1,62 @@
+stages:
+  - build
+  - linting
+  - tests
+  - deploy-staging
+  - deploy-production
+
+build:
+  stage: build
+  image: node:18.7.0-buster
+  script:
+    - npm i @nestjs/cli
+    - npm ci --cache .npm --prefer-offline
+    - npm run build
+  cache:
+    key: npm
+    paths:
+      - .npm/
+  artifacts:
+    paths:
+      - node_modules/
+  tags:
+    - ci-msg
+
+linting:
+  extends: build
+  stage: linting
+  script:
+    - npm run lint
+  tags:
+    - ci-msg
+
+unit-tests:
+  extends: build
+  stage: tests
+  script:
+    - npm run test
+  tags:
+    - ci-msg
+
+
+deploy-staging:
+  stage: deploy-staging
+  image:
+    name: docker/compose:latest
+  script:
+    - docker-compose -f docker-compose.staging.yml up --build -d
+  only:
+    - staging
+  tags:
+    - ci-msg
+
+deploy-production:
+  stage: deploy-production
+  image:
+    name: docker/compose:latest
+  script:
+    - docker-compose -f docker-compose.production.yml up --build -d
+  only:
+    - main
+  tags:
+    - ci-msg

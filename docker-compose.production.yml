@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: bitnami/mongodb:latest
+    container_name: messenger-mongodb-production
+    restart: always
+    networks:
+      - messenger-network-production
+    volumes:
+      - ~/messenger-mongodb-production:/data/db
+    environment:
+      MONGODB_ROOT_USERNAME: root
+      MONGODB_ROOT_PASSWORD: GV9z9Gv36O8FgNzgwBnRIwqxs2futI0Yzxr4sq0UNTTo8GDzt7245sPSns8gatnP
+      MONGODB_USERNAME: user-messenger
+      MONGODB_PASSWORD: 9j8kdldpq98DMjd9kdki1
+      MONGODB_DATABASE: messenger
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    container_name: messenger-backend-production
+    restart: always
+    networks:
+      - default
+      - messenger-network-production
+    ports:
+      - "3000"
+    depends_on:
+      - mongodb
+volumes:
+  messenger-mongodb-production:
+    driver: local
+networks:
+  default:
+    name: containers-controller_default
+    external: true
+  messenger-network-production:
+    name: messenger-network-production
+    driver: bridge

@@ -30,11 +30,14 @@ export class UsersService {
     return user;
   }
 
-  async findByExternalIdOrCreate(service: string, createUserDto: CreateUserDto): Promise<UserDocument> {
+  async findByExternalIdOrCreate(service: string, createUserDto: any): Promise<UserDocument> {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access
     const user = await this.findByExternalId(service, createUserDto.externalId);
     if (user) {
       return user;
     }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     const newUser = await this.create(createUserDto);
     return newUser;
   }

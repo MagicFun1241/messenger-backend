@@ -5,16 +5,45 @@ import path from 'path';
 import { existsSync, readdirSync, readFileSync } from 'fs';
 import Interpreter from 'sval';
 import { AuthenticationService } from '@/authentication/authentication.service';
-import { AuthenticationServiceCallback, ServiceInstance } from '@/@types/extensions';
+import {
+  AuthenticationServiceCallback,
+  AuthenticationSource,
+  ServiceInstance,
+} from '@/@types/extensions';
+
+interface SourceOptions {
+  dependencies: Array<string>;
+  callback: AuthenticationServiceCallback;
+}
 
 @Injectable()
 export class ExtensionsService {
   private readonly logger = new Logger(ExtensionsService.name);
 
-  private registered = new Map<string, {
-    dependencies: Array<string>;
-    callback: AuthenticationServiceCallback;
-  }>();
+  private registered = new Map<string, Omit<SourceOptions, 'callback'>>();
+
+  private callbacks = new Map<AuthenticationSource, Map<string, Omit<SourceOptions, 'dependencies'>>>();
+
+  private updateService(source: AuthenticationSource, service: string, options: SourceOptions) {
+    let callbackItem = this.callbacks.get(source);
+    if (callbackItem == null) {
+      callbackItem = new Map() as any;
+    }
+
+    callbackItem.set(service, { callback: options.callback });
+    this.callbacks.set(source, callbackItem);
+
+    this.registered.set(source, { dependencies: options.dependencies });
+  }
+
+  private callbackExist(source: AuthenticationSource, service: string) {
+    let s = this.callbacks.get(source);
+    if (s == null) {
+      s = new Map() as any;
+    }
+
+    return s.has(service);
+  }
 
   constructor(private readonly authenticationService: AuthenticationService) {
     try {
@@ -66,9 +95,9 @@ export class ExtensionsService {
                 return {
                   dependencies,
                   run: () => {
-                    if (this.registered.has(name)) return;
+                    if (this.callbackExist(AuthenticationSource.http, name)) return;
 
-                    this.registered.set(name, {
+                    this.updateService(AuthenticationSource.http, name, {
                       callback,
                       dependencies,
                     });
@@ -107,32 +136,46 @@ export class ExtensionsService {
     return this.registered.has(name);
   }
 
-  executeHttpAuthenticationCallback(service: string, body: any): any {
-    const item = this.registered.get(service);
-    return item.callback({
-      body,
-      database: {
-        users: {
-          findByExternalId: this.authenticationService.findByExternalId,
-        },
-        externalTokens: {
-          // eslint-disable-next-line consistent-return
-          insert(p1, cb = null) {
-            const action = () => {};
+  get(name: string) {
+    return this.registered.get(name);
+  }
 
-            if (cb == null) {
-              return new Promise<any>((resolve) => {
-                action();
-                resolve({});
-              });
-            }
+  executeAuthenticationCallback(source: AuthenticationSource, service: string, body: any): any {
+    let item = this.callbacks.get(source);
+    if (item == null) {
+      item = new Map() as any;
+    }
 
-            action();
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-            cb({});
+    const c = item.get(service);
+    if (c != null) {
+      return c.callback({
+        body,
+        database: {
+          // users: {
+          //   findByExternalId: this.authenticationService.findByExternalId,
+          // },
+          users: {} as any,
+          externalTokens: {
+            // eslint-disable-next-line consistent-return
+            insert(p1, cb = null) {
+              const action = () => {};
+
+              if (cb == null) {
+                return new Promise<any>((resolve) => {
+                  action();
+                  resolve({});
+                });
+              }
+
+              action();
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+              cb({});
+            },
           },
         },
-      }
-    });
+      });
+    }
+
+    return null;
   }
 }

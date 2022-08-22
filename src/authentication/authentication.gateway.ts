@@ -30,19 +30,21 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     @MessageBody() messageBody: AuthTokenExternalDto,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<unknown>> {
-    if (!this.extensionsService.has(messageBody.service)) {
-      throw new WsFormatException({
+    if (messageBody.service !== 'volsu' && !this.extensionsService.has(messageBody.service)) {
+      /* throw new WsFormatException({
         event,
         code: 3401,
         message: 'External token is invalid',
         isCloseWs: true,
-      });
+      }); */
+      return;
     }
     const accessToken = await this.authService.createSession(
       messageBody.tokenExternal,
       client.remoteAddress,
       'get-access-token',
     );
+    // eslint-disable-next-line consistent-return
     return {
       event: 'get-access-token',
       data: {

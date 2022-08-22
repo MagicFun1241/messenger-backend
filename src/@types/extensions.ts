@@ -1,3 +1,8 @@
+export enum AuthenticationSource {
+  http = 'http',
+  websocket = 'ws',
+}
+
 export interface ServiceInstance {
   dependencies: Array<string>;
   run: () => void;

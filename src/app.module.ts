@@ -2,6 +2,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MessagesModule } from '@/messages/messages.module';
+import { ConversationsModule } from '@/conversations/conversations.module';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { WsModule } from './ws/ws.module';
@@ -33,6 +34,7 @@ import { WsModule } from './ws/ws.module';
     UsersModule,
     MessagesModule,
     AuthenticationModule,
+    ConversationsModule,
     WsModule,
   ],
   controllers: [],

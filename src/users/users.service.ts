@@ -10,7 +10,7 @@ export class UsersService {
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
   ) {}
 
-  async findOne(userId: string): Promise<UserDocument | null> {
+  async findById(userId: string): Promise<UserDocument | null> {
     const user = await this.UserModel.findById(userId).exec();
     return user;
   }

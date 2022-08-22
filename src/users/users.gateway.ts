@@ -1,6 +1,7 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody } from '@nestjs/websockets';
-import { PickOnly } from '@/helpers';
-import { UserDocument } from '@/users/schemas/user.schema';
+import {
+  WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket,
+} from '@nestjs/websockets';
+import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { UsersService } from './users.service';
 import { FindOneUserDto } from './dto/find-one-user.dto';
 
@@ -14,7 +15,7 @@ export class UsersGateway {
   async findOneUserHandler(
     @MessageBody() id: string,
   ): Promise<FindOneUserDto & { id: string }> {
-    const result = await this.usersService.findOne(id);
+    const result = await this.usersService.findById(id);
     return {
       id: result._id,
       firstName: result.firstName,
@@ -23,7 +24,16 @@ export class UsersGateway {
   }
 
   @SubscribeMessage('findMe')
-  async findMe(): Promise<PickOnly<UserDocument, 'firstName' | 'lastName' | 'photo'>> {
-    return null;
+  async findMe(
+    @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<any> {
+    const me = await this.usersService.findById(client.id);
+
+    // TODO: Реализовать когда-нибудь двухфакторную аутентификацию
+    return {
+      id: me._id,
+      firstName: me.firstName,
+      lastName: me.lastName,
+    };
   }
 }

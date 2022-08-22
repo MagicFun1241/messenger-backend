@@ -30,18 +30,18 @@ import { WsModule } from './ws/ws.module';
       },
       inject: [ConfigService],
     }),
-    RedisModule.forRootAsync({
-      useFactory: (configService: ConfigService) => {
-        const port = configService.get<string>('REDIS_PORT');
-        return {
-          host: configService.get<string>('REDIS_HOST'),
-          port: port == null ? undefined : parseInt(port, 10),
-          username: configService.get<string>('REDIS_USER'),
-          password: configService.get<string>('REDIS_PASSWORD'),
-        };
-      },
-      inject: [ConfigService],
-    }),
+    // RedisModule.forRootAsync({
+    //   useFactory: (configService: ConfigService) => {
+    //     const port = configService.get<string>('REDIS_PORT');
+    //     return {
+    //       host: configService.get<string>('REDIS_HOST'),
+    //       port: port == null ? undefined : parseInt(port, 10),
+    //       username: configService.get<string>('REDIS_USER'),
+    //       password: configService.get<string>('REDIS_PASSWORD'),
+    //     };
+    //   },
+    //   inject: [ConfigService],
+    // }),
     UsersModule,
     AuthenticationModule,
     WsModule,

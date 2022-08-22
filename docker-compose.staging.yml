@@ -29,6 +29,7 @@ services:
       - messenger-network-staging
     ports:
       - "3000"
+      - "8080"
     depends_on:
       - mongodb
 volumes:

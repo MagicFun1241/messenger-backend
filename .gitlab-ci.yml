@@ -41,6 +41,8 @@ unit-tests:
 
 deploy-staging:
   stage: deploy-staging
+  image:
+    name: docker/compose:latest
   script:
     - docker-compose -f docker-compose.staging.yml up --build -d
   only:
@@ -50,6 +52,8 @@ deploy-staging:
 
 deploy-production:
   stage: deploy-production
+  image:
+    name: docker/compose:latest
   script:
     - docker-compose -f docker-compose.production.yml up --build -d
   only:

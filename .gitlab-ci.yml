@@ -17,6 +17,7 @@ build:
     paths:
       - .npm/
   artifacts:
+    expire_in: 4 days
     paths:
       - node_modules/
   tags:

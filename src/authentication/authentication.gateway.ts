@@ -13,7 +13,6 @@ import { ExtensionsService } from '@/extentions/extensions.service';
 import { AuthenticationService } from './authentication.service';
 import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
 import { AuthTokenExternalDto } from './dto/auth.token-external.dto';
-import {WsFormatException} from "@/ws/exceptions/ws.format.exception";
 
 @WebSocketGateway(8080, { cors: true })
 export class AuthenticationGateway implements OnGatewayDisconnect {

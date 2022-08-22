@@ -2,6 +2,7 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { MessagesModule } from '@/messages/messages.module';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { WsModule } from './ws/ws.module';
@@ -45,6 +46,7 @@ import { WsModule } from './ws/ws.module';
       inject: [ConfigService],
     }),
     UsersModule,
+    MessagesModule,
     AuthenticationModule,
     WsModule,
   ],

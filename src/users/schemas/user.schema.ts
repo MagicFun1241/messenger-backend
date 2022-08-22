@@ -27,8 +27,9 @@ export class User {
   @Prop({ required: true })
     dateOfBirth: Date;
 
-  @Prop({ required: true })
-    externalAccounts: Array<string | { type: Types.ObjectId, ref: 'User', required: true }>;
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    externalAccounts: Array<string | {}>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

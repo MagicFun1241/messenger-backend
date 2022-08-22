@@ -13,7 +13,6 @@ import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { TokenExternal, TokenExternalDocument } from './schemas/token-external.schema';
 import { Session, SessionDocument } from './schemas/session.schema';
-import { CreateTokenExternalDto } from './dto/create-token-external.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -28,33 +27,32 @@ export class AuthenticationService {
     private readonly wsService: WsService,
   ) {}
 
-  private async findTokenExternalModelByTokenAndIp(
-    tokenExternal: string,
-    ip: string,
-  ): Promise<TokenExternalDocument | null> {
-    const tokenExternalModel = await this.TokenExternalModel.findOne({ token: tokenExternal, ip }).exec();
+  async findTokenExternalModelByPayload(payload: any): Promise<TokenExternalDocument | null> {
+    const tokenExternalModel = await this.TokenExternalModel.findOne({
+      payload,
+    }).exec();
+
     return tokenExternalModel;
   }
 
-  private async createOrFindNewUserByToken(tokenExternal: string): Promise<UserDocument> {
-    if (await this.jwtService.verifyAsync(
-      tokenExternal,
-      { secret: this.configService.get<string>('TOKEN_EXTERNAL_SECRET') },
-    )) {
-      const tokenExternalDecoded = this.jwtService.decode(tokenExternal) as CreateUserDto;
-      const user = await this.userService.findByExternalIdOrCreate(tokenExternalDecoded);
-      return user;
-    }
-    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+  decodeJwt(token: string) {
+    return this.jwtService.decode(token);
   }
 
-  async createTokenExternal(createTokenExternalDto: CreateTokenExternalDto): Promise<string> {
+  verifyJwt(token: string, secret: string) {
+    return this.jwtService.verify(token, { secret });
+  }
+
+  async createTokenExternal(createTokenExternalDto: any): Promise<string> {
     const user = await this.createOrFindNewUserByToken(createTokenExternalDto.token);
-    const newTokenExternal = await (new this.TokenExternalModel({
+    const newTokenExternal = await this.TokenExternalModel.create({
       token: createTokenExternalDto.token,
-      ip: createTokenExternalDto.ip,
+      payload: {
+        ip: createTokenExternalDto.ip,
+      },
       userId: user._id,
-    })).save();
+    });
+
     return newTokenExternal.token;
   }
 

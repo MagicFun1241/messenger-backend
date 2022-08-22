@@ -1,12 +1,10 @@
-version: "3.9"
+version: "3.8"
 
 services:
   mongodb:
     image: bitnami/mongodb:latest
     container_name: messenger-mongodb-production
     restart: always
-    ports:
-      - "27017"
     networks:
       - messenger-network-production
     volumes:
@@ -31,9 +29,6 @@ services:
       - messenger-network-production
     ports:
       - "3000"
-#    volumes:
-#      - "./config.json:/app/config.json"
-#      - "./data:/app/storage"
     depends_on:
       - mongodb
 volumes:

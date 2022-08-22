@@ -5,6 +5,7 @@ import {
 import { ExtensionsService } from '@/extentions/extensions.service';
 import { AuthenticationSource } from '@/@types/extensions';
 import { AuthenticationService } from './authentication.service';
+import { CreateTokenExternalDto } from './dto/create-token-external.dto';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -17,7 +18,7 @@ export class AuthenticationController {
 
   @Post('services/volsu')
   async usingVolsu(
-    @Body() createTokenExternalDto: any,
+    @Body() createTokenExternalDto: CreateTokenExternalDto,
   ): Promise<{ tokenExternal: string }> {
     const tokenExternal = await this.authService.createTokenExternal(createTokenExternalDto);
     return {

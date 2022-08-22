@@ -10,10 +10,4 @@ import { UsersService } from '@/users/users.service';
 export class MessagesGateway {
   constructor(private readonly usersService: UsersService) {
   }
-
-  @UseFilters(WsFilterException)
-  @SubscribeMessage('post-message')
-  async postMessage(@MessageBody() messageBody: CreateMessageDto) {
-
-  }
 }

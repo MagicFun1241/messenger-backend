@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import { Document } from 'mongoose';
 import { Timestamps } from '@/@types/mongoose';
 
 export type UserDocument = User & Document<string> & Timestamps;
@@ -27,9 +27,8 @@ export class User {
   @Prop({ required: true })
     dateOfBirth: Date;
 
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    externalAccounts: Array<string | {}>;
+  @Prop({ required: true })
+    externalAccounts: Array<{ service: string, id: string }>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

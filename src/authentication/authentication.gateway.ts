@@ -9,7 +9,6 @@ import {
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
 import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
-import { ExtensionsService } from '@/extentions/extensions.service';
 import { AuthenticationService } from './authentication.service';
 import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
 import { AuthTokenExternalDto } from './dto/auth.token-external.dto';
@@ -20,7 +19,6 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
 
   constructor(
     private readonly authService: AuthenticationService,
-    private readonly extensionsService: ExtensionsService,
   ) {}
 
   @UseFilters(WsFilterException)
@@ -29,21 +27,12 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     @MessageBody() messageBody: AuthTokenExternalDto,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<unknown>> {
-    if (messageBody.service !== 'volsu' && !this.extensionsService.has(messageBody.service)) {
-      /* throw new WsFormatException({
-        event,
-        code: 3401,
-        message: 'External token is invalid',
-        isCloseWs: true,
-      }); */
-      return;
-    }
     const accessToken = await this.authService.createSession(
       messageBody.tokenExternal,
       client.remoteAddress,
       'get-access-token',
     );
-    // eslint-disable-next-line consistent-return
+
     return {
       event: 'get-access-token',
       data: {

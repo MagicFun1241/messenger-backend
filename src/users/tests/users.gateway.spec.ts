@@ -10,7 +10,6 @@ jest.mock('../users.service');
 
 describe('UsersGateway', () => {
   let usersGateway: UsersGateway;
-  let usersService: UsersService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -22,7 +21,6 @@ describe('UsersGateway', () => {
     }).compile();
 
     usersGateway = module.get<UsersGateway>(UsersGateway);
-    usersService = module.get<UsersService>(UsersService);
     jest.clearAllMocks();
   });
 

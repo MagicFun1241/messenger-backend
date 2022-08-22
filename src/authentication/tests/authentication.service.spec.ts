@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from '@/users/users.module';
 import { WsModule } from '@/ws/ws.module';
 import { UsersService } from '@/users/users.service';
 import { AuthenticationService } from '../authentication.service';

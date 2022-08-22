@@ -9,5 +9,5 @@ export const userStub = (): User & { _id: string } => ({
   userName: 'int1m',
   email: 'mostovoy@volsu.ru',
   dateOfBirth: new Date(),
-  externalId: 1,
+  externalAccounts: [{ service: 'volsu', id: '1' }],
 });

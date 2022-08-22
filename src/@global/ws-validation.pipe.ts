@@ -2,7 +2,7 @@ import { Injectable, Scope, ValidationPipe } from '@nestjs/common';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 
 @Injectable({ scope: Scope.REQUEST })
-export class WSValidationPipe extends ValidationPipe {
+export class WsValidationPipe extends ValidationPipe {
   createExceptionFactory() {
     return (validationErrors = []) => {
       if (this.isDetailedOutputDisabled) {

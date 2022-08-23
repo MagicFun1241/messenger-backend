@@ -3,6 +3,7 @@ import { MessagesGateway } from '@/messages/messages.gateway';
 import { MongooseModule } from '@nestjs/mongoose';
 
 import { UsersModule } from '@/users/users.module';
+import { ConversationsModule } from '@/conversations/conversations.module';
 
 import { Message, MessageSchema } from './schemas/message.schema';
 import { MessagesService } from './messages.service';
@@ -11,6 +12,7 @@ import { MessagesService } from './messages.service';
   imports: [
     MongooseModule.forFeature([{ name: Message.name, schema: MessageSchema }]),
     UsersModule,
+    ConversationsModule,
   ],
   providers: [MessagesGateway, MessagesService],
   exports: [MessagesService],

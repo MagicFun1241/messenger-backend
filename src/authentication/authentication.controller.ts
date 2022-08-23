@@ -20,6 +20,7 @@ export class AuthenticationController {
   async usingVolsu(
     @Body() createTokenExternalDto: CreateTokenExternalDto,
   ): Promise<{ tokenExternal: string }> {
+    this.logger.log(JSON.stringify(createTokenExternalDto));
     const tokenExternal = await this.authService.createTokenExternal(createTokenExternalDto);
     return {
       tokenExternal,

@@ -28,7 +28,7 @@ describe('UsersGateway', () => {
     expect(usersGateway).toBeDefined();
   });
 
-  describe('findOneUser', () => {
+  describe('findById', () => {
     describe('When findOneUser is called', () => {
       let user: FindByIdDto & { id: string };
 

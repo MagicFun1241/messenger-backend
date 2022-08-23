@@ -44,13 +44,13 @@ export class AuthenticationService {
   }
 
   private async createOrFindNewUserByToken(tokenExternal: string): Promise<UserDocument> {
-    this.logger.log(`TOKEN: ${tokenExternal}`);
-    this.logger.log(`SECRET: ${this.configService.get<string>('TOKEN_EXTERNAL_SECRET')}`);
     if (await this.jwtService.verifyAsync(
       tokenExternal,
       { secret: this.configService.get<string>('TOKEN_EXTERNAL_SECRET') },
     )) {
-      const tokenExternalDecoded = this.jwtService.decode(tokenExternal) as CreateUserDto;
+      const tokenExternalDecoded = (
+        this.jwtService.decode(tokenExternal) as Record<string, unknown>
+      ).data as CreateUserDto;
       this.logger.log(JSON.stringify(tokenExternalDecoded));
 
       const user = await this.userService.findByExternalIdOrCreate(tokenExternalDecoded);

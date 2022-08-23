@@ -16,6 +16,27 @@ services:
       MONGODB_PASSWORD: 9mkffg4sdidkIFIMFOkmfk
       MONGODB_DATABASE: messenger
 
+  mongodb-express:
+    image: mongo-express
+    container_name: messenger-mongodb-express-staging
+    restart: always
+    networks:
+      - messenger-network-staging
+    volumes:
+      - ~/messenger-mongodb-staging:/data/db
+    environment:
+      ME_CONFIG_MONGODB_SERVER: messenger-mongodb-staging
+      ME_CONFIG_MONGODB_PORT: 27017
+      ME_CONFIG_MONGODB_AUTH_DATABASE: admin
+      ME_CONFIG_MONGODB_AUTH_USERNAME: root
+      ME_CONFIG_MONGODB_AUTH_PASSWORD: GVf9fk99DKiodklps,mvixivxg
+      ME_CONFIG_BASICAUTH_USERNAME: admin
+      ME_CONFIG_BASICAUTH_PASSWORD: O9fkf19jGqio.z9vmG4kc8b87hhuiq9
+    depends_on:
+      - mongodb
+    ports:
+      - "8081"
+
   backend:
     build:
       context: .
@@ -32,6 +53,8 @@ services:
       - "8080"
     depends_on:
       - mongodb
+
+
 volumes:
   messenger-mongodb-staging:
     driver: local

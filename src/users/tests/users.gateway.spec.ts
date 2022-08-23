@@ -29,13 +29,15 @@ describe('UsersGateway', () => {
   });
 
   describe('findById', () => {
-    describe('When findOneUser is called', () => {
+    describe('When findById is called', () => {
       let user: FindByIdDto & { id: string };
 
       beforeEach(async () => {
         user = await usersGateway.findOneUserHandler({
           id: userStub()._id,
         });
+
+        console.log(user);
       });
 
       test('then is should param _id equal return _id', () => {

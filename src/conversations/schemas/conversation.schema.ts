@@ -32,6 +32,9 @@ export class Conversation {
   @Prop({ required: true })
     type: ConversationType;
 
+  @Prop()
+    name: string;
+
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], required: true })
     members: Array<UserDocument>;
 

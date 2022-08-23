@@ -1,11 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { Model, PipelineStage } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
+  private allowedTags = new Set<string>();
+
   constructor(
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
   ) {}
@@ -39,24 +41,46 @@ export class UsersService {
     return newUser;
   }
 
-  async search(query: string): Promise<UserDocument[]> {
-    const users = await this.UserModel.aggregate<UserDocument>([
-      {
+  async search(queryText: string, tags: Array<string> = null): Promise<UserDocument[]> {
+    const aggregationQuery: Array<PipelineStage> = [];
+
+    if (queryText != null && queryText !== '') {
+      aggregationQuery.push({
         $addFields: {
           fullName: { $concat: ['$firstName', '$lastName', '$userName'] },
         },
-      },
-      {
-        $search: { fullName: query },
-      },
-    ]);
+      });
 
+      aggregationQuery.push({
+        $search: { fullName: queryText },
+      });
+    }
+
+    if (tags != null) {
+      aggregationQuery.unshift({
+        $match: {
+          tags: { $in: tags },
+        },
+      });
+    }
+
+    const users = await this.UserModel.aggregate<UserDocument>(aggregationQuery);
     return users;
   }
 
   async delete(userId: string): Promise<void> {
     await this.UserModel.deleteOne({
       _id: userId,
+    });
+  }
+
+  tagAllowed(value: string) {
+    return this.allowedTags.has(value);
+  }
+
+  addAllowedTags(items: string[]) {
+    items.forEach((item) => {
+      this.allowedTags.add(item);
     });
   }
 }

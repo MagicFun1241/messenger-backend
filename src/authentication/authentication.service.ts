@@ -49,6 +49,8 @@ export class AuthenticationService {
       { secret: this.configService.get<string>('TOKEN_EXTERNAL_SECRET') },
     )) {
       const tokenExternalDecoded = this.jwtService.decode(tokenExternal) as CreateUserDto;
+      this.logger.log(JSON.stringify(tokenExternalDecoded));
+
       const user = await this.userService.findByExternalIdOrCreate(tokenExternalDecoded);
       return user;
     }

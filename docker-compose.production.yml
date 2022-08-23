@@ -22,8 +22,10 @@ services:
     restart: always
     networks:
       - messenger-network-production
+    volumes:
+      - ~/messenger-mongodb-production:/data/db
     environment:
-      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_SERVER: messenger-mongodb-production
       ME_CONFIG_MONGODB_PORT: 27017
       ME_CONFIG_MONGODB_ENABLE_ADMIN: false
       ME_CONFIG_MONGODB_AUTH_DATABASE: admin

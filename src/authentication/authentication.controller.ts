@@ -13,7 +13,6 @@ export class AuthenticationController {
 
   constructor(
     private readonly authService: AuthenticationService,
-    private readonly extensions: ExtensionsService,
   ) {}
 
   @Post('services/volsu')
@@ -26,12 +25,12 @@ export class AuthenticationController {
     };
   }
 
-  @Post('services/:name')
-  async usingService(@Param('name') name: string, @Body() body: any): Promise<any> {
-    if (!this.extensions.has(name)) {
-      throw new HttpException('Authorization service not found', HttpStatus.NOT_FOUND);
-    }
-
-    return this.extensions.executeAuthenticationCallback(AuthenticationSource.http, name, body);
-  }
+  // @Post('services/:name')
+  // async usingService(@Param('name') name: string, @Body() body: any): Promise<any> {
+  //   if (!this.extensions.has(name)) {
+  //     throw new HttpException('Authorization service not found', HttpStatus.NOT_FOUND);
+  //   }
+  //
+  //   return this.extensions.executeAuthenticationCallback(AuthenticationSource.http, name, body);
+  // }
 }

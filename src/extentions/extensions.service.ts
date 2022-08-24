@@ -13,6 +13,8 @@ import {
 
 interface SourceOptions {
   dependencies: Array<string>;
+  // В секундах
+  tokenExpiration?: number;
   callback: AuthenticationServiceCallback;
 }
 
@@ -20,7 +22,14 @@ interface SourceOptions {
 export class ExtensionsService {
   private readonly logger = new Logger(ExtensionsService.name);
 
-  private registered = new Map<string, Omit<SourceOptions, 'callback'>>();
+  private registered = new Map<string, Omit<SourceOptions, 'callback'>>([
+    ['volsu', {
+      dependencies: [],
+      tokenExpiration: 15 * 60,
+      // @ts-ignore
+      callback: (() => {}) as any,
+    }],
+  ]);
 
   private callbacks = new Map<AuthenticationSource, Map<string, Omit<SourceOptions, 'dependencies'>>>();
 
@@ -138,6 +147,15 @@ export class ExtensionsService {
 
   get(name: string) {
     return this.registered.get(name);
+  }
+
+  list() {
+    return Array.from(this.registered.keys());
+  }
+
+  getTokenExpiration(service: string) {
+    const s = this.registered.get(service);
+    return s.tokenExpiration || 0;
   }
 
   executeAuthenticationCallback(source: AuthenticationSource, service: string, body: any): any {

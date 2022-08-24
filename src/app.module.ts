@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { MessagesModule } from '@/messages/messages.module';
 import { ConversationsModule } from '@/conversations/conversations.module';
+import { ScheduleModule } from '@nestjs/schedule';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { WsModule } from './ws/ws.module';
@@ -13,6 +14,7 @@ import { WsModule } from './ws/ws.module';
       envFilePath: `${process.cwd()}/configs/.env.${process.env.NODE_ENV || 'development'}`,
       isGlobal: true,
     }),
+    ScheduleModule.forRoot(),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => {

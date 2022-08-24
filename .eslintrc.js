@@ -69,5 +69,8 @@ module.exports = {
     'class-methods-use-this': 'off', // разрешает создание методов без использования this, нужно для controllers & gateways
     'import/no-cycle': 'off', // разрешает циклический импорт, нужно для схем и их проекций
     'max-classes-per-file': 'off', // неудобно, да и не хочу я так писать
+    // чтобы свободно использовать for-of
+    'no-restricted-syntax': 'off',
+    'no-await-in-loop': 'off',
   },
 };

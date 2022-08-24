@@ -13,9 +13,12 @@ import { WsService } from '@/ws/ws.service';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 
+import { Cron } from '@nestjs/schedule';
+import { ExtensionsService } from '@/extentions/extensions.service';
 import { TokenExternal, TokenExternalDocument } from './schemas/token-external.schema';
 import { Session, SessionDocument } from './schemas/session.schema';
 import { CreateTokenExternalDto } from './dto/create-token-external.dto';
+import dayjs from "dayjs";
 
 @Injectable()
 export class AuthenticationService {
@@ -28,6 +31,7 @@ export class AuthenticationService {
     private readonly jwtService: JwtService,
     private readonly userService: UsersService,
     private readonly wsService: WsService,
+    private readonly extensionsService: ExtensionsService,
   ) {}
 
   async findTokenExternalModelByPayload(tokenExternal: string, ip: string): Promise<TokenExternalDocument | null> {
@@ -150,5 +154,21 @@ export class AuthenticationService {
     }
 
     return false;
+  }
+
+  @Cron('*/5 * * * *')
+  private async removeExpiredTokensTask() {
+    for (const name of this.extensionsService.list()) {
+      const expiration = this.extensionsService.getTokenExpiration(name);
+      if (expiration === 0) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+
+      await this.TokenExternalModel.deleteMany({
+        service: name,
+        createdAt: { $lt: dayjs().subtract(expiration, 'seconds').toDate() },
+      });
+    }
   }
 }

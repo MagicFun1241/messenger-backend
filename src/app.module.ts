@@ -4,10 +4,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MessagesModule } from '@/messages/messages.module';
 import { ConversationsModule } from '@/conversations/conversations.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ExtensionsModule } from '@/extentions/extensions.module';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { WsModule } from './ws/ws.module';
-import {ExtensionsModule} from "@/extentions/extensions.module";
 
 @Module({
   imports: [

@@ -5,6 +5,7 @@ import { UsersService } from '../users.service';
 import { User } from '../schemas/user.schema';
 import { userStub } from './stubs/user.stub';
 import { FindByIdDto } from '../dto/findById.dto';
+import {ConfigService} from "@nestjs/config";
 
 jest.mock('../users.service');
 
@@ -14,6 +15,7 @@ describe('UsersGateway', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        ConfigService,
         UsersGateway,
         UsersService,
         { provide: getModelToken(User.name), useValue: User },
@@ -36,8 +38,6 @@ describe('UsersGateway', () => {
         user = await usersGateway.findOneUserHandler({
           id: userStub()._id,
         });
-
-        console.log(user);
       });
 
       test('then is should param _id equal return _id', () => {

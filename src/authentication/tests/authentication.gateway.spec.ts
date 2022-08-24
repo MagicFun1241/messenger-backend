@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { WsModule } from '@/ws/ws.module';
 import { UsersService } from '@/users/users.service';
+import { ExtensionsService } from '@/extentions/extensions.service';
 import { AuthenticationGateway } from '../authentication.gateway';
 import { TokenExternal } from '../schemas/token-external.schema';
 import { Session } from '../schemas/session.schema';
@@ -22,6 +23,7 @@ describe('AuthGateway', () => {
         WsModule,
       ],
       providers: [
+        ExtensionsService,
         AuthenticationGateway,
         AuthenticationService,
         UsersService,

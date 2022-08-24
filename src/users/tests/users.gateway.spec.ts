@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
 import { UsersGateway } from '../users.gateway';
 import { UsersService } from '../users.service';
 import { User } from '../schemas/user.schema';
 import { userStub } from './stubs/user.stub';
 import { FindByIdDto } from '../dto/findById.dto';
-import {ConfigService} from "@nestjs/config";
 
 jest.mock('../users.service');
 

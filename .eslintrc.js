@@ -57,6 +57,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+
     '@typescript-eslint/require-await': 'off', // для использования .forRootAsync
     '@typescript-eslint/no-unsafe-return': 'off', // для дополнений
     '@typescript-eslint/no-unsafe-assignment': 'off', // тоже для дополнений
@@ -67,6 +68,7 @@ module.exports = {
     'no-underscore-dangle': ['error', { 'allow': ['_id'] }], // разрешает использование нижнего подчеркивания для id, нужно для mongo
     'no-param-reassign': ['error', { 'props': false }], // разрешает мутацию пропсов объекта
     'class-methods-use-this': 'off', // разрешает создание методов без использования this, нужно для controllers & gateways
+
     'import/no-cycle': 'off', // разрешает циклический импорт, нужно для схем и их проекций
     'max-classes-per-file': 'off', // неудобно, да и не хочу я так писать
     // чтобы свободно использовать for-of

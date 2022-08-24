@@ -27,6 +27,7 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     @MessageBody() messageBody: AuthTokenExternalDto,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<unknown>> {
+    this.logger.log(`GetAccessTokenDto: ${JSON.stringify(messageBody)}, ip: ${client.remoteAddress}`);
     const accessToken = await this.authService.createSession(
       messageBody.tokenExternal,
       client.remoteAddress,

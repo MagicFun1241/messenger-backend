@@ -156,8 +156,8 @@ export class WsAdapter extends AbstractWsAdapter {
     server.on(CONNECTION_EVENT, (ws: any, req: any, client: unknown) => {
       ws.remoteAddress = req.socket.remoteAddress;
       this.logger.log(`socket.remoteAddress: ${req.socket.remoteAddress}`);
+      this.logger.log(`headers: ${JSON.stringify(req.headers)}`);
       if (req.headers['x-forwarded-for']) {
-        this.logger.log(`headers x-forwarded-for: ${req.headers['x-forwarded-for']}`);
         ws.remoteAddress = req.headers['x-forwarded-for'].split(',')[0].trim();
       }
     });

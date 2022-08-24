@@ -44,5 +44,4 @@ import {ExtensionsModule} from "@/extentions/extensions.module";
   controllers: [],
   providers: [],
 })
-
 export class AppModule {}

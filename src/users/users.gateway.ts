@@ -4,8 +4,12 @@ import {
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { FindByQueryDto } from '@/users/dto/findByQuery.dto';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
-import { UsersService } from './users.service';
+import { UpdateMeDto } from '@/users/dto/updateMe.dto';
+import axios from 'axios';
+import { ConfigService } from '@nestjs/config';
+import { ExternalSearchQueryDto } from '@/users/dto/externalSearchQuery.dto';
 import { FindByIdDto } from './dto/findById.dto';
+import { UsersService } from './users.service';
 
 interface UserItem {
   id: string;
@@ -20,11 +24,32 @@ interface UserItem {
   policy?: any;
 }
 
+interface ResultItem {
+  id: string;
+  username: string;
+  firstname: string | null;
+  lastname: string | null;
+  middlename: string | null;
+}
+
+interface ExternalSearchItem {
+  id: string;
+  fullName: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
+
+  linked: boolean;
+}
+
 @WebSocketGateway(8080, {
   cors: true,
 })
 export class UsersGateway {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @SubscribeMessage('findUserById')
   async findOneUserHandler(
@@ -58,6 +83,14 @@ export class UsersGateway {
     };
   }
 
+  @SubscribeMessage('updateMe')
+  async updateMe(
+  @MessageBody() body: UpdateMeDto,
+    @ConnectedSocket() client: WebSocketEntity,
+  ) {
+    return {};
+  }
+
   @SubscribeMessage('findUsersByQuery')
   async search(
   @MessageBody() body: FindByQueryDto,
@@ -69,5 +102,46 @@ export class UsersGateway {
       lastName: e.lastName,
       tags: e.tags,
     }));
+  }
+
+  @SubscribeMessage('findExternalUsersByQuery')
+  async externalSearch(
+  @MessageBody() body: ExternalSearchQueryDto,
+  ) {
+    const r = await axios.get<{
+      status: boolean;
+      result: Array<any> | false;
+    }>('https://dev.lk.volsu.ru/search/find-users-by-full-name', {
+      params: {
+        fullName: body.query,
+        token: this.configService.get('TOKEN_LK'),
+        env: process.env.NODE_ENV,
+      },
+    });
+
+    if (!r.data.status) {
+      throw new WsFormatException('Internal server error');
+    }
+
+    return {
+      volsu: await Promise.all((r.data.result as Array<ResultItem>).map(async (e) => {
+        let ri: ExternalSearchItem = {
+          id: e.id,
+          fullName: e.username,
+        } as any;
+
+        ri.linked = (await this.usersService.existsWithExternalId('volsu', e.id)) != null;
+
+        const parts = e.username.split(' ');
+        if (parts.length > 1) {
+          const [lastName, firstName, middleName] = parts;
+          ri = {
+            ...ri, lastName, firstName, middleName,
+          };
+        }
+
+        return ri;
+      })),
+    };
   }
 }

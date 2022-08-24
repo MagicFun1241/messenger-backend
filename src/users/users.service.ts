@@ -68,6 +68,10 @@ export class UsersService {
     return users;
   }
 
+  async existsWithExternalId(service: string, id: string) {
+    return this.UserModel.exists({ externalAccounts: { $in: [{ service, id }] } });
+  }
+
   async delete(userId: string): Promise<void> {
     await this.UserModel.deleteOne({
       _id: userId,

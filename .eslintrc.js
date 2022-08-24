@@ -72,5 +72,7 @@ module.exports = {
     // чтобы свободно использовать for-of
     'no-restricted-syntax': 'off',
     'no-await-in-loop': 'off',
+    'no-continue': 'off', // глупость какая-то
+    'linebreak-style': 'off', // у меня используется LF, но периодически проскакивает CRLF
   },
 };

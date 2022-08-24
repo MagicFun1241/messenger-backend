@@ -161,7 +161,6 @@ export class AuthenticationService {
     for (const name of this.extensionsService.list()) {
       const expiration = this.extensionsService.getTokenExpiration(name);
       if (expiration === 0) {
-        // eslint-disable-next-line no-continue
         continue;
       }
 

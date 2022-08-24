@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { ExtensionsService } from '@/extentions/extensions.service';
+
+import { ExtensionsService } from './extensions.service';
 
 @Module({
   providers: [ExtensionsService],

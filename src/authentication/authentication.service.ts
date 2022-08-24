@@ -1,10 +1,13 @@
-import { Model } from 'mongoose';
 import {
   HttpException, HttpStatus, Injectable, Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
+import dayjs from 'dayjs';
+import { Model } from 'mongoose';
 
 import { UsersService } from '@/users/users.service';
 import { CreateUserDto } from '@/users/dto/create-user.dto';
@@ -13,9 +16,8 @@ import { WsService } from '@/ws/ws.service';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { ExtensionsService } from '@/extentions/extensions.service';
-import dayjs from 'dayjs';
+
 import { TokenExternal, TokenExternalDocument } from './schemas/token-external.schema';
 import { Session, SessionDocument } from './schemas/session.schema';
 import { CreateTokenExternalDto } from './dto/create-token-external.dto';
@@ -31,7 +33,6 @@ export class AuthenticationService {
     private readonly jwtService: JwtService,
     private readonly userService: UsersService,
     private readonly wsService: WsService,
-    private readonly extensionsService: ExtensionsService,
   ) {}
 
   async findTokenExternalModelByPayload(tokenExternal: string, ip: string): Promise<TokenExternalDocument | null> {
@@ -156,18 +157,18 @@ export class AuthenticationService {
     return false;
   }
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
-  private async removeExpiredTokensTask() {
-    for (const name of this.extensionsService.list()) {
-      const expiration = this.extensionsService.getTokenExpiration(name);
-      if (expiration === 0) {
-        continue;
-      }
-
-      await this.TokenExternalModel.deleteMany({
-        service: name,
-        createdAt: { $lt: dayjs().subtract(expiration, 'seconds').toDate() },
-      });
-    }
-  }
+  // @Cron(CronExpression.EVERY_5_MINUTES)
+  // private async removeExpiredTokensTask() {
+  //   for (const name of this.extensionsService.list()) {
+  //     const expiration = this.extensionsService.getTokenExpiration(name);
+  //     if (expiration === 0) {
+  //       continue;
+  //     }
+  //
+  //     await this.TokenExternalModel.deleteMany({
+  //       service: name,
+  //       createdAt: { $lt: dayjs().subtract(expiration, 'seconds').toDate() },
+  //     });
+  //   }
+  // }
 }

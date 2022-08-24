@@ -2,9 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+
 import { WsModule } from '@/ws/ws.module';
 import { UsersService } from '@/users/users.service';
-import { ExtensionsService } from '@/extentions/extensions.service';
+
 import { AuthenticationService } from '../authentication.service';
 import { TokenExternal } from '../schemas/token-external.schema';
 import { Session } from '../schemas/session.schema';
@@ -23,7 +24,6 @@ describe('AuthService', () => {
       ],
       providers: [
         AuthenticationService,
-        ExtensionsService,
         UsersService,
         { provide: getModelToken(TokenExternal.name), useValue: TokenExternal },
         { provide: getModelToken(Session.name), useValue: Session },

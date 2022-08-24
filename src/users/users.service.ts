@@ -1,8 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { Model, PipelineStage } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config';
+import { Model, PipelineStage } from 'mongoose';
+
+import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
+
 import { User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ExternalSearchApiResult, ExternalSearchItem } from './@types/users.types';
 
 @Injectable()
 export class UsersService {
@@ -10,6 +15,7 @@ export class UsersService {
 
   constructor(
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
+    private readonly configService: ConfigService,
   ) {}
 
   async findById(userId: string): Promise<UserDocument | null> {
@@ -66,6 +72,28 @@ export class UsersService {
 
     const users = await this.UserModel.aggregate<UserDocument>(aggregationQuery);
     return users;
+  }
+
+  async searchByExternalService(query: string): Promise<Array<ExternalSearchItem>> {
+    const urlSearchParams = new URLSearchParams({
+      fullName: query,
+      token: this.configService.get('TOKEN_LK'),
+      env: process.env.NODE_ENV,
+    }).toString();
+
+    const response = await fetch(`https://dev.lk.volsu.ru/search/find-users-by-full-name?${urlSearchParams}`);
+    const result = await response.json() as Array<ExternalSearchApiResult>;
+
+    if (response.status > 201) {
+      throw new WsFormatException('Internal server error');
+    }
+
+    const searchedUsers: Array<ExternalSearchItem> = result.map((user) => ({
+      externalId: user.id,
+      title: user.username,
+    }));
+
+    return searchedUsers;
   }
 
   async existsWithExternalId(service: string, id: string) {

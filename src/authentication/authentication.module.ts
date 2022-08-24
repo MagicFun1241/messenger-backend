@@ -4,7 +4,6 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { UsersModule } from '@/users/users.module';
 import { WsModule } from '@/ws/ws.module';
-import { ExtensionsService } from '@/extentions/extensions.service';
 
 import { TokenExternal, TokenExternalSchema } from './schemas/token-external.schema';
 import { Session, SessionSchema } from './schemas/session.schema';
@@ -30,12 +29,13 @@ import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
     UsersModule,
     WsModule,
   ],
-  controllers: [AuthenticationController],
+  controllers: [
+    AuthenticationController,
+  ],
   providers: [
     AuthenticationGateway,
     AuthWsJwtGuard,
     AuthenticationService,
-    ExtensionsService,
   ],
   exports: [AuthWsJwtGuard],
 })

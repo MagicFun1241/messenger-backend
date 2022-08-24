@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
+
 import { UsersGateway } from '../users.gateway';
 import { UsersService } from '../users.service';
 import { User } from '../schemas/user.schema';

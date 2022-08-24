@@ -7,6 +7,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { WsModule } from './ws/ws.module';
+import {ExtensionsModule} from "@/extentions/extensions.module";
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { WsModule } from './ws/ws.module';
       },
       inject: [ConfigService],
     }),
+    ExtensionsModule,
     UsersModule,
     MessagesModule,
     AuthenticationModule,

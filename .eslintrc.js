@@ -40,7 +40,7 @@ module.exports = {
       },
     },
   },
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.js', 'ws-adapter.adapter.ts'],
   overrides: [
     {
       files: ['test/**', '.*\\.spec\\.ts$'],

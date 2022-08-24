@@ -56,7 +56,6 @@ export class AuthenticationService {
       const tokenExternalDecoded = (
         this.jwtService.decode(tokenExternal) as Record<string, unknown>
       ).data as CreateUserDto;
-      this.logger.log(JSON.stringify(tokenExternalDecoded));
 
       const user = await this.userService.findByExternalIdOrCreate(tokenExternalDecoded);
       return user;
@@ -91,7 +90,7 @@ export class AuthenticationService {
         throw new WsFormatException({
           event,
           code: 3401,
-          message: 'External token is invalid',
+          message: 'External token not found in database',
           isCloseWs: true,
         });
       }
@@ -102,7 +101,7 @@ export class AuthenticationService {
     throw new WsFormatException({
       event,
       code: 3401,
-      message: 'External token is invalid',
+      message: 'External verify failed',
       isCloseWs: true,
     });
   }

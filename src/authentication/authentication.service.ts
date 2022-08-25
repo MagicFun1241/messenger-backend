@@ -72,6 +72,7 @@ export class AuthenticationService {
       service: createTokenExternalDto.service,
       ip: createTokenExternalDto.ip,
     });
+    await newTokenExternal.save();
 
     return newTokenExternal.token;
   }

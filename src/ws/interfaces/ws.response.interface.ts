@@ -5,5 +5,5 @@ export interface WsResponse<T = unknown> {
 
 interface WsResponseData<T = unknown> {
   status: boolean;
-  data?: T;
+  data: T;
 }

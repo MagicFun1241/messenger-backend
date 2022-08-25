@@ -49,12 +49,13 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
   async authHandler(
     @MessageBody() messageBody: AuthTokenExternalDto,
       @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<WsResponse<{ status: boolean }>> {
+  ): Promise<WsResponse<boolean>> {
     const result = await this.authService.setTokenAccessToConnection(client, messageBody.tokenExternal);
     return {
       event: 'auth',
       data: {
         status: true,
+        data: result,
       },
     };
   }

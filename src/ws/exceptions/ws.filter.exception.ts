@@ -12,7 +12,10 @@ export class WsFilterException extends BaseWsExceptionFilter {
     if (exception.error) {
       client.send(pack({
         event: exception.error.event,
-        data: exception.error.message,
+        data: {
+          status: false,
+          errors: exception.error.message,
+        },
       }));
 
       if (exception.error.isCloseWs) {
@@ -21,7 +24,10 @@ export class WsFilterException extends BaseWsExceptionFilter {
     } else {
       client.send(pack({
         event: 'exception',
-        data: exception.message,
+        data: {
+          status: false,
+          errors: exception.message,
+        },
       }));
     }
   }

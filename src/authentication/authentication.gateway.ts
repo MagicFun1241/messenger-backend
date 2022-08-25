@@ -50,6 +50,7 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     @MessageBody() messageBody: string,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<boolean>> {
+    this.logger.log(`messageBody: ${messageBody}`);
     const result = await this.authService.setTokenAccessToConnection(client, messageBody);
     return {
       event: 'auth',

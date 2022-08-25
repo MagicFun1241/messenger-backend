@@ -2,15 +2,27 @@ import { User } from '../../schemas/user.schema';
 
 export const userStub = (): User & { _id: string } => ({
   _id: '507f191e810c19729de860ea',
-  firstName: 'Max',
-  lastName: 'Mostovoy',
+  firstName: 'Николай',
+  lastName: 'Федотов',
   middleName: null,
-  userName: 'int1m',
+  userName: 'nphedotov',
 
   photo: null,
   tags: [],
 
-  email: 'mostovoy@volsu.ru',
+  email: 'mail@example.com',
   dateOfBirth: new Date(),
-  externalAccounts: [{ service: 'volsu', id: '1' }],
+  externalAccounts: [{ service: 'volsu', id: '000131678' }],
+});
+
+export const externalUsersStub = (): any => ({
+  volsu: [
+    {
+      id: '000131678',
+      firstName: 'Николай',
+      lastName: 'Федотов',
+      middleName: null,
+      linked: true,
+    },
+  ],
 });

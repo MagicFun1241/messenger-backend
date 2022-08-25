@@ -12,6 +12,13 @@ import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { MessageDocument } from '@/messages/schemas/message.schema';
 import { ConversationsService } from '@/conversations/conversations.service';
 import { ConversationType } from '@/conversations/schemas/conversation.schema';
+import { GetMessagesDto } from '@/messages/dto/getList';
+
+interface MessageItem {
+  id: string;
+  text?: string;
+  sender: string;
+}
 
 @WebSocketGateway(8080, {
   cors: true,
@@ -21,6 +28,27 @@ export class MessagesGateway {
     private readonly messagesService: MessagesService,
     private readonly conversationsService: ConversationsService,
   ) {}
+
+  @SubscribeMessage('getMessagesByConversation')
+  async getList(
+    @MessageBody() body: GetMessagesDto,
+      @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<Array<MessageItem>> {
+    const hasAccess = await this.conversationsService.hasAccess(body.conversation, client.id);
+    if (!hasAccess) {
+      throw new WsFormatException('Conversation not found');
+    }
+
+    const items = await this.messagesService.find({
+      conversation: body.conversation,
+    });
+
+    return items.map((e) => ({
+      id: e._id,
+      text: e.text,
+      sender: e.sender._id,
+    }));
+  }
 
   @SubscribeMessage('postMessageToGroup')
   async postMessageToGroup(

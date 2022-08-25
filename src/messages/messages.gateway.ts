@@ -44,7 +44,10 @@ export class MessagesGateway {
 
     const items = await this.messagesService.find({
       conversation: body.conversation,
-    }, body.page * body.count);
+    }, {
+      offset: body.page * body.count,
+      count: body.count,
+    });
 
     return items.map((e) => ({
       id: e._id,

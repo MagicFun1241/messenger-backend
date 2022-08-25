@@ -47,10 +47,10 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
   @UseFilters(WsFilterException)
   @SubscribeMessage('auth')
   async authHandler(
-    @MessageBody() messageBody: AuthTokenExternalDto,
+    @MessageBody() messageBody: string,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<boolean>> {
-    const result = await this.authService.setTokenAccessToConnection(client, messageBody.tokenExternal);
+    const result = await this.authService.setTokenAccessToConnection(client, messageBody);
     return {
       event: 'auth',
       data: {

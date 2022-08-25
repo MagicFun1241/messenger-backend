@@ -14,7 +14,7 @@ export class MessagesService {
     return this.messageModel.create(data);
   }
 
-  async find(query: FilterQuery<MessageDocument>) {
-    return this.messageModel.find(query).populate('sender', ['_id']).exec();
+  async find(query: FilterQuery<MessageDocument>, offset = 0) {
+    return this.messageModel.find(query).skip(offset).populate('sender', ['_id']).exec();
   }
 }

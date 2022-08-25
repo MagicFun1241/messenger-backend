@@ -39,9 +39,12 @@ export class MessagesGateway {
       throw new WsFormatException('Conversation not found');
     }
 
+    body.count = body.count || 10;
+    body.page = body.page || 1;
+
     const items = await this.messagesService.find({
       conversation: body.conversation,
-    });
+    }, body.page * body.count);
 
     return items.map((e) => ({
       id: e._id,

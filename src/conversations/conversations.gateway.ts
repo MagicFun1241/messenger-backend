@@ -9,6 +9,7 @@ import { CreateConversationDto } from '@/conversations/dto/createConversation';
 import { FindConversationByIdDto } from '@/conversations/dto/findConversationById.dto';
 import { UpdateConversationNameDto } from '@/conversations/dto/updateConversationName.dto';
 import { FindConversationByNameDto } from '@/conversations/dto/findConversationByName.dto';
+import { GetConversationsDto } from '@/conversations/dto/getConversations.dto';
 
 interface ConversationItem {
   id?: string;
@@ -64,6 +65,22 @@ export class ConversationsGateway {
     };
   }
 
+  @SubscribeMessage('getConversations')
+  async getList(
+  @MessageBody() body: GetConversationsDto,
+    @ConnectedSocket() client: WebSocketEntity,
+  ) {
+    body.page = body.page || 1;
+    body.count = body.count || 10;
+
+    const items = await this.conversationsService.findByMembers([client.id], {}, {
+      extended: body.extended,
+      skip: body.page * body.count,
+      limit: body.count,
+    });
+    return items.map((e) => this.formatItem(e, body.extended));
+  }
+
   @SubscribeMessage('findConversationById')
   async findById(
     @MessageBody() body: FindConversationByIdDto,
@@ -83,7 +100,14 @@ export class ConversationsGateway {
     @MessageBody() body: FindConversationByNameDto,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<Array<ConversationItem>> {
-    const r = await this.conversationsService.findByMembers([client.id], { $text: { $search: body.value } });
+    body.page = body.page || 1;
+    body.count = body.count || 10;
+
+    const r = await this.conversationsService.findByMembers([client.id], { $text: { $search: body.value } }, {
+      extended: body.extended,
+      skip: body.page * body.count,
+      limit: body.count,
+    });
     return r.map((e) => this.formatItem(e, body.extended));
   }
 

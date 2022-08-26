@@ -1,8 +1,7 @@
 import {
-  Body, Controller, Ip, Logger, Post
+  Body, Controller, Ip, Logger, Post, Get,
 } from '@nestjs/common';
 
-import { Public } from './guards/auth.public.decorator';
 import { AuthenticationService } from './authentication.service';
 import { CreateTokenExternalDto } from './dto/create-token-external.dto';
 
@@ -14,7 +13,6 @@ export class AuthenticationController {
     private readonly authService: AuthenticationService,
   ) {}
 
-  @Public()
   @Post('services/volsu')
   async usingVolsu(
     @Body() createTokenExternalDto: CreateTokenExternalDto,
@@ -25,12 +23,15 @@ export class AuthenticationController {
     };
   }
 
-  @Public()
-  @Post('services/volsu-test')
+  @Get('services/volsu-test')
   async createSessionTokenForTestAccount(
     @Ip() requestIp: string,
   ): Promise<{ tokenExternal: string }> {
-    const tokenExternal = await this.authService.createTokenExternalForTestAccount(requestIp);
+    let ip = requestIp;
+    if (ip === '127.0.0.1') {
+      ip = '::1';
+    }
+    const tokenExternal = await this.authService.createTokenExternalForTestAccount(ip);
     return {
       tokenExternal,
     };

@@ -1,8 +1,7 @@
 import { Reflector } from '@nestjs/core';
 import {
-  CanActivate, ExecutionContext, Injectable,
+  CanActivate, ExecutionContext, Injectable, Logger,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
@@ -11,8 +10,9 @@ import { IS_PUBLIC_KEY } from './auth.public.decorator';
 
 @Injectable()
 export class AuthWsJwtGuard implements CanActivate {
+  private readonly logger = new Logger(AuthWsJwtGuard.name);
+
   constructor(
-    private readonly configService: ConfigService,
     private readonly reflector: Reflector,
   ) {}
 
@@ -23,6 +23,8 @@ export class AuthWsJwtGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
+
+    this.logger.log('Guard!!!');
 
     if (isPublic) {
       return true;
@@ -35,7 +37,7 @@ export class AuthWsJwtGuard implements CanActivate {
     throw new WsFormatException({
       event,
       code: 3401,
-      message: 'Token is invalid',
+      message: 'Guard: token is invalid',
       isCloseWs: true,
     });
   }

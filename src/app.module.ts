@@ -1,5 +1,3 @@
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-
 import { Logger, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -12,10 +10,6 @@ import { UsersModule } from '@/users/users.module';
 import { AuthenticationModule } from '@/authentication/authentication.module';
 import { WsModule } from '@/ws/ws.module';
 import { SearchModule } from '@/search/search.module';
-
-import { AuthWsJwtGuard } from '@/authentication/guards/auth.ws-jwt.guard';
-import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
-import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -52,15 +46,5 @@ import { JwtModule } from '@nestjs/jwt';
     SearchModule,
   ],
   controllers: [],
-  providers: [
-    {
-      provide: APP_GUARD,
-      useClass: AuthWsJwtGuard,
-    },
-    {
-      provide: APP_FILTER,
-      useClass: WsFilterException,
-    },
-  ],
 })
 export class AppModule {}

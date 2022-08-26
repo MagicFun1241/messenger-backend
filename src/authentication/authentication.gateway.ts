@@ -3,12 +3,14 @@ import {
   ConnectedSocket, MessageBody,
   SubscribeMessage,
   WebSocketGateway,
-  WsResponse,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
+
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
 import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
+import { WsResponse } from '@/ws/interfaces/ws.response.interface';
+
 import { AuthenticationService } from './authentication.service';
 import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
 import { AuthTokenExternalDto } from './dto/auth.token-external.dto';
@@ -27,7 +29,6 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     @MessageBody() messageBody: AuthTokenExternalDto,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<string>> {
-    this.logger.log(`ip: ${client.remoteAddress}`);
     const accessToken = await this.authService.createSession(
       messageBody.tokenExternal,
       client.remoteAddress,
@@ -36,21 +37,26 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
 
     return {
       event: 'get-access-token',
-      data: accessToken,
+      data: {
+        status: true,
+        data: accessToken,
+      },
     };
   }
 
   @UseFilters(WsFilterException)
   @SubscribeMessage('auth')
   async authHandler(
-    @MessageBody() messageBody: AuthTokenExternalDto,
+    @MessageBody() messageBody: string,
       @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<WsResponse<{ status: boolean }>> {
-    const result = await this.authService.setTokenAccessToConnection(client, messageBody.tokenExternal);
+  ): Promise<WsResponse<boolean>> {
+    this.logger.log(`messageBody: ${messageBody}`);
+    const result = await this.authService.setTokenAccessToConnection(client, messageBody);
     return {
       event: 'auth',
       data: {
-        status: result,
+        status: true,
+        data: result,
       },
     };
   }
@@ -63,7 +69,8 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     return {
       event: 'auth-test',
       data: {
-        test: 'okay!',
+        status: true,
+        data: 'okay!',
       },
     };
   }

@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
 import { Timestamps } from '@/@types/mongoose';
 import { ConversationDocument } from '@/conversations/schemas/conversation.schema';
-import {UserDocument} from "@/users/schemas/user.schema";
+import { UserDocument } from '@/users/schemas/user.schema';
 
 export type MessageDocument = Message & Document<string> & Timestamps;
 

@@ -37,6 +37,8 @@ import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
     AuthWsJwtGuard,
     AuthenticationService,
   ],
-  exports: [AuthWsJwtGuard],
+  exports: [
+    AuthWsJwtGuard,
+  ],
 })
 export class AuthenticationModule {}

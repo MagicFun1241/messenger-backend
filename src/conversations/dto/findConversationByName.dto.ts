@@ -1,4 +1,6 @@
-import {IsBoolean, IsInt, IsNotEmpty, IsString, Max, Min} from 'class-validator';
+import {
+  IsBoolean, IsInt, IsNotEmpty, IsString, Max, Min,
+} from 'class-validator';
 
 export class FindConversationByNameDto {
   @IsString()

@@ -15,6 +15,7 @@ export class MessagesService {
   }
 
   async find(query: FilterQuery<MessageDocument>, options = { offset: 0, count: 10 }) {
-    return this.messageModel.find(query).skip(options.offset).limit(options.count).populate('sender', ['_id']).exec();
+    return this.messageModel.find(query).skip(options.offset).limit(options.count).populate('sender', ['_id'])
+      .exec();
   }
 }

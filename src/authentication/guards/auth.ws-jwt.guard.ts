@@ -3,9 +3,12 @@ import {
   CanActivate, ExecutionContext, Injectable,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
+
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
-import { ConfigService } from '@nestjs/config';
+
+import { IS_PUBLIC_KEY } from './auth.public.decorator';
 
 @Injectable()
 export class AuthWsJwtGuard implements CanActivate {
@@ -18,11 +21,16 @@ export class AuthWsJwtGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient<WebSocketEntity>();
     const event = this.reflector.get<string>('ws-message', context.getHandler());
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-    if (await this.jwtService.verifyAsync(
-      client.tokenAccess,
-      { secret: this.configService.get<string>('TOKEN_ACCESS_SECRET') },
-    )) {
+    if (isPublic) {
+      return true;
+    }
+
+    if (client.tokenAccess) {
       return true;
     }
 

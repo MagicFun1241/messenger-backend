@@ -1,9 +1,8 @@
 import {
-  Body, Controller, HttpException, HttpStatus, Logger, Param, Post,
+  Body, Controller, Logger, Post,
 } from '@nestjs/common';
 
-import { ExtensionsService } from '@/extentions/extensions.service';
-import { AuthenticationSource } from '@/@types/extensions';
+import { Public } from './guards/auth.public.decorator';
 import { AuthenticationService } from './authentication.service';
 import { CreateTokenExternalDto } from './dto/create-token-external.dto';
 
@@ -15,6 +14,7 @@ export class AuthenticationController {
     private readonly authService: AuthenticationService,
   ) {}
 
+  @Public()
   @Post('services/volsu')
   async usingVolsu(
     @Body() createTokenExternalDto: CreateTokenExternalDto,

@@ -10,6 +10,7 @@ import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 
+import { Public } from './guards/auth.public.decorator';
 import { AuthenticationService } from './authentication.service';
 import { AuthTokenExternalDto } from './dto/auth.token-external.dto';
 
@@ -21,6 +22,8 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     private readonly authService: AuthenticationService,
   ) {}
 
+  @Public()
+  @MessageMetaData('get-access-token')
   @SubscribeMessage('get-access-token')
   async getAccessTokenHandler(
     @MessageBody() messageBody: AuthTokenExternalDto,
@@ -41,6 +44,8 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     };
   }
 
+  @Public()
+  @MessageMetaData('auth')
   @SubscribeMessage('auth')
   async authHandler(
     @MessageBody() messageBody: string,

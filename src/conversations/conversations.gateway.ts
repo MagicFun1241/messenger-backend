@@ -16,6 +16,7 @@ interface ConversationItem {
   type: ConversationType;
   name?: string;
   members: Array<string> | Array<{ id: string; firstName: string; lastName: string; }>;
+  lastMessage?: string | { id: string; text?: string; sender: string; };
 }
 
 @WebSocketGateway(8080, {
@@ -31,12 +32,20 @@ export class ConversationsGateway {
     } as any;
 
     if (extended) {
+      // @ts-ignore
+      r.lastMessage = item.lastMessage == null ? undefined : {
+        id: item.lastMessage._id,
+        text: item.lastMessage.text,
+        sender: item.lastMessage.sender._id,
+      };
+
       r.members = item.members.map((e) => ({
         id: e._id,
         firstName: e.firstName,
         lastName: e.lastName,
       }));
     } else {
+      r.lastMessage = item.lastMessage._id;
       r.members = item.members.map((e) => (e._id));
     }
 

@@ -28,7 +28,7 @@ export class User {
     dateOfBirth: Date;
 
   @Prop({ default: [] })
-    tags: Array<string>;
+    tags?: Array<string>;
 
   @Prop({ required: true })
     externalAccounts: Array<{ service: string, id: string }>;

@@ -76,6 +76,29 @@ export class AuthenticationService {
     return newTokenExternal.token;
   }
 
+  async createTokenExternalForTestAccount(requestIp: string): Promise<string> {
+    const user = await this.userService.findByExternalIdOrCreate({
+      firstName: 'Test',
+      lastName: 'Test',
+      middleName: 'Test',
+      email: 'test@test.com',
+      dateOfBirth: new Date(),
+      externalAccounts: [{ service: 'volsu', id: '1' }],
+    });
+
+    const newTokenExternal = await this.TokenExternalModel.create({
+      userId: user._id,
+      token: await this.jwtService.signAsync({ userId: user._id }, {
+        secret: this.configService.get<string>('TOKEN_EXTERNAL_SECRET'),
+        expiresIn: '5m',
+      }),
+      service: 'volsu',
+      ip: requestIp,
+    });
+
+    return newTokenExternal.token;
+  }
+
   private async validatingTokenExternal(
     tokenExternal: string,
     ip: string,
@@ -115,7 +138,7 @@ export class AuthenticationService {
       expiresIn: this.configService.get<string>('TOKEN_ACCESS_EXPIRATION'),
     });
 
-    const newSession = await this.SessionModel.create({
+    await this.SessionModel.create({
       userId: externalTokenModel.userId,
       token: tokenAccess,
       lastIp: ip,
@@ -124,7 +147,7 @@ export class AuthenticationService {
 
     await externalTokenModel.delete();
 
-    return newSession.token;
+    return tokenAccess;
   }
 
   public async setTokenAccessToConnection(client: WebSocketEntity, tokenAccess: string): Promise<boolean> {

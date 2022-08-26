@@ -26,8 +26,8 @@ import { AuthWsJwtGuard } from './guards/auth.ws-jwt.guard';
       },
     ]),
     JwtModule,
-    UsersModule,
     WsModule,
+    UsersModule,
   ],
   controllers: [
     AuthenticationController,

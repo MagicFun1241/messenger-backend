@@ -15,6 +15,7 @@ import { SearchModule } from '@/search/search.module';
 
 import { AuthWsJwtGuard } from '@/authentication/guards/auth.ws-jwt.guard';
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
       },
       inject: [ConfigService],
     }),
+
     ExtensionsModule,
     UsersModule,
     MessagesModule,

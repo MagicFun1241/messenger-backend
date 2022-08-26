@@ -34,7 +34,7 @@ export class ConversationsGateway {
     if (extended) {
       // @ts-ignore
       r.lastMessage = item.lastMessage == null ? undefined : {
-        id: item.lastMessage,
+        id: item.lastMessage._id,
         text: item.lastMessage.text,
         sender: item.lastMessage.sender._id,
       };

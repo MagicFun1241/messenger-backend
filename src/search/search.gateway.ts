@@ -18,16 +18,18 @@ export class SearchGateway {
     private readonly searchService: SearchService,
   ) {}
 
-  @MessageMetaData('global-search')
-  @SubscribeMessage('global-search')
+  @MessageMetaData('search-global-chats')
+  @SubscribeMessage('search-global-chats')
   async globalSearchHandler(
     @MessageBody() messageBody: string,
-  ): Promise<WsResponse<string>> {
+  ): Promise<WsResponse<unknown>> {
+    const searchGlobalChatsResult = await this.searchService.usersSearch(messageBody);
+
     return {
-      event: 'global-search',
+      event: 'search-global-chats',
       data: {
         status: true,
-        data: '',
+        data: searchGlobalChatsResult,
       },
     };
   }

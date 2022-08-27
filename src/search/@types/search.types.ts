@@ -15,3 +15,12 @@ export interface ExternalSearchItem {
   externalId: string;
   title: string;
 }
+
+export interface SearchUserItem {
+  id: string,
+  title: string,
+  label: string,
+  avatar: string | undefined,
+  verified: boolean,
+  isLinked: boolean,
+}

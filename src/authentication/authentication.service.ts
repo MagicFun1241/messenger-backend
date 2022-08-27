@@ -151,8 +151,6 @@ export class AuthenticationService {
   }
 
   public async setTokenAccessToConnection(client: WebSocketEntity, tokenAccess: string): Promise<boolean> {
-    this.logger.log(`Token access: ${tokenAccess}`);
-
     if (await this.jwtService.verifyAsync(
       tokenAccess,
       { secret: this.configService.get<string>('TOKEN_ACCESS_SECRET') },

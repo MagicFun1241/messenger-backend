@@ -1,4 +1,7 @@
-import { ArrayMaxSize, IsArray, IsString } from 'class-validator';
+import {
+  ArrayMaxSize, IsArray, IsString, Validate,
+} from 'class-validator';
+import { IsUniqueItemsArray } from '@/validation/unique';
 
 export class FindByQueryDto {
   @IsString()
@@ -6,5 +9,8 @@ export class FindByQueryDto {
 
   @IsArray()
   @ArrayMaxSize(5)
+  @Validate(IsUniqueItemsArray, {
+    message: 'Tags must be unique',
+  })
     tags?: Array<string>;
 }

@@ -51,15 +51,7 @@ export class UsersService {
     const aggregationQuery: Array<PipelineStage> = [];
 
     if (queryText != null && queryText !== '') {
-      aggregationQuery.push({
-        $addFields: {
-          fullName: { $concat: ['$firstName', '$lastName', '$userName'] },
-        },
-      });
-
-      aggregationQuery.push({
-        $search: { fullName: queryText },
-      });
+      aggregationQuery.push({ $match: { $text: { $search: queryText } } });
     }
 
     if (tags != null) {

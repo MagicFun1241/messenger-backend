@@ -1,7 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { ExternalSearchApiResult, ExternalSearchItem } from '@/users/@types/users.types';
-import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { ConfigService } from '@nestjs/config';
+
+import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
+
+import {
+  ExternalSearchApiResponse,
+  ExternalSearchItem,
+} from './@types/search.types';
 
 @Injectable()
 export class SearchService {
@@ -19,10 +24,10 @@ export class SearchService {
     }).toString();
 
     const response = await fetch(`https://dev.lk.volsu.ru/search/find-users-by-full-name?${urlSearchParams}`);
-    const result = await response.json() as Array<ExternalSearchApiResult>;
+    const { result } = await response.json() as ExternalSearchApiResponse;
 
     if (response.status > 201) {
-      throw new WsFormatException('Internal server error');
+      throw new WsFormatException(`Internal server error. Status ${response.status}`);
     }
 
     const searchedUsers: Array<ExternalSearchItem> = result.map((user) => ({

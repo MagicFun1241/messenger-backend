@@ -1,12 +1,14 @@
+import * as fs from 'fs';
+
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { Logger } from '@nestjs/common';
-// import { WsAdapter } from 'nestjs-ws-binary-adapter';
-import { WsAdapter } from './ws-adapter/ws-adapter.adapter';
-import * as fs from 'fs';
+import { WsAdapter } from 'nestjs-ws-binary-adapter';
+// import { WsAdapter } from '@/ws-adapter/ws-adapter.adapter';
+
 import { AppModule } from '@/app.module';
 import { WsValidationPipe } from '@/@global/ws-validation.pipe';
 
@@ -25,6 +27,7 @@ async function bootstrap() {
       https: httpsOptions,
     }),
   );
+
   app.enableCors();
 
   app.useWebSocketAdapter(new WsAdapter(app));

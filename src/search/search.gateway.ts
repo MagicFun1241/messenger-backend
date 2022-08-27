@@ -1,10 +1,15 @@
+import { UseFilters, UseGuards } from '@nestjs/common';
 import { MessageBody, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 
+import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
+import { AuthWsJwtGuard } from '@/authentication/guards/auth.ws-jwt.guard';
 import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
 
 import { SearchService } from './search.service';
 
+@UseFilters(WsFilterException)
+@UseGuards(AuthWsJwtGuard)
 @WebSocketGateway(8080, {
   cors: true,
 })

@@ -1,6 +1,6 @@
 import { Reflector } from '@nestjs/core';
 import {
-  CanActivate, ExecutionContext, Injectable, Logger,
+  CanActivate, ExecutionContext, Injectable,
 } from '@nestjs/common';
 
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
@@ -10,8 +10,6 @@ import { IS_PUBLIC_KEY } from './auth.public.decorator';
 
 @Injectable()
 export class AuthWsJwtGuard implements CanActivate {
-  private readonly logger = new Logger(AuthWsJwtGuard.name);
-
   constructor(
     private readonly reflector: Reflector,
   ) {}
@@ -23,8 +21,6 @@ export class AuthWsJwtGuard implements CanActivate {
       context.getHandler(),
       context.getClass(),
     ]);
-
-    this.logger.log('Guard!!!');
 
     if (isPublic) {
       return true;

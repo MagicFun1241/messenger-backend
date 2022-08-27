@@ -33,7 +33,6 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     @MessageBody() messageBody: AuthTokenExternalDto,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<string>> {
-    this.logger.log(`get-access-token ip: ${client.remoteAddress}`);
     const accessToken = await this.authService.createSession(
       messageBody.tokenExternal,
       client.remoteAddress,
@@ -56,7 +55,6 @@ export class AuthenticationGateway implements OnGatewayDisconnect {
     @MessageBody() messageBody: string,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<boolean>> {
-    this.logger.log(`messageBody: ${messageBody}`);
     const result = await this.authService.setTokenAccessToConnection(client, messageBody);
     return {
       event: 'auth',

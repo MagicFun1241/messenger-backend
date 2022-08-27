@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
+import { UsersService } from '@/users/users.service';
 
 import {
   ExternalSearchApiResponse,
@@ -14,6 +15,7 @@ export class SearchService {
 
   constructor(
     private readonly configService: ConfigService,
+    private readonly userService: UsersService,
   ) {}
 
   async searchByExternalService(query: string): Promise<Array<ExternalSearchItem>> {
@@ -36,5 +38,10 @@ export class SearchService {
     }));
 
     return searchedUsers;
+  }
+
+  async usersSearch(query: string) {
+    const externalUsers = await this.searchByExternalService(query);
+    const localUsers = await this.userService.search(query);
   }
 }

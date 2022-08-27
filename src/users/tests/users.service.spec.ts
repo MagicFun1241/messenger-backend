@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
 import { getModelToken } from '@nestjs/mongoose';
 
-import { User } from '@/users/schemas/user.schema';
+import { User, UserDocument } from '@/users/schemas/user.schema';
 
 import { UsersService } from '../users.service';
 
@@ -14,7 +14,10 @@ describe('UsersService', () => {
       imports: [
         ConfigModule,
       ],
-      providers: [UsersService, { provide: getModelToken(User.name), useValue: User }],
+      providers: [
+        UsersService,
+        { provide: getModelToken(User.name), useValue: User },
+      ],
     }).compile();
 
     service = module.get<UsersService>(UsersService);
@@ -23,4 +26,12 @@ describe('UsersService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
+  // describe('search', () => {
+  //   describe('When search is called', () => {
+  //     let searchedUsers: Array<UserDocument>;
+  //
+  //     const searchFullName = 'Мостовой';
+  //   });
+  // });
 });

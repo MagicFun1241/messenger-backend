@@ -1,9 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
 
+import { UsersService } from '@/users/users.service';
+
 import { SearchService } from '../search.service';
 
 import { ExternalSearchItem } from '../@types/search.types';
+
+jest.mock('../../users/users.service');
 
 describe('SearchService', () => {
   let service: SearchService;
@@ -18,6 +22,7 @@ describe('SearchService', () => {
       ],
       providers: [
         SearchService,
+        UsersService,
       ],
     }).compile();
 

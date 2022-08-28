@@ -152,8 +152,10 @@ export class WsAdapter extends AbstractWsAdapter {
   }
 
   bindClientConnect(server: any, callback: Function) {
+    server.setMaxListeners(100);
     super.bindClientConnect(server, callback);
-    server.on(CONNECTION_EVENT, (ws: any, req: any, client: unknown) => {
+    server.on(CONNECTION_EVENT, (ws: any, req: any, client: any) => {
+      ws.setMaxListeners(100);
       ws.remoteAddress = req.socket.remoteAddress;
       this.logger.log(`socket.remoteAddress: ${req.socket.remoteAddress}`);
       this.logger.log(`headers: ${JSON.stringify(req.headers)}`);

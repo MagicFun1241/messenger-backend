@@ -32,7 +32,7 @@ export class UsersGateway {
     }
 
     return {
-      id: result._id,
+      id: result._id.toString(),
       firstName: result.firstName,
       lastName: result.lastName,
       tags: result.tags,
@@ -43,11 +43,11 @@ export class UsersGateway {
   async findMe(
     @ConnectedSocket() client: WebSocketEntity,
   ): Promise<UserItem> {
-    const me = await this.usersService.findById(client.id);
+    const me = await this.usersService.findById(client.userId);
 
     // TODO: Реализовать когда-нибудь двухфакторную аутентификацию
     return {
-      id: me._id,
+      id: me._id.toString(),
       firstName: me.firstName,
       lastName: me.lastName,
       tags: me.tags,

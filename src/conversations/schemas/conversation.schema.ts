@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, ObjectId } from 'mongoose';
 import { Timestamps } from '@/@types/mongoose';
 import { MessageDocument } from '@/messages/schemas/message.schema';
 import { UserDocument } from '@/users/schemas/user.schema';
@@ -25,7 +25,7 @@ export interface ConversationRole {
   value: Role;
 }
 
-export type ConversationDocument = Conversation & Document<string> & Timestamps;
+export type ConversationDocument = Conversation & Document<ObjectId> & Timestamps;
 
 @Schema({ timestamps: true })
 export class Conversation {

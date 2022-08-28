@@ -34,7 +34,7 @@ export class MessagesGateway {
     @MessageBody() body: GetMessagesDto,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<Array<MessageItem>> {
-    const hasAccess = await this.conversationsService.hasAccess(body.conversation, client.id);
+    const hasAccess = await this.conversationsService.hasAccess(body.conversation, client.userId);
     if (!hasAccess) {
       throw new WsFormatException('Conversation not found');
     }
@@ -50,9 +50,9 @@ export class MessagesGateway {
     });
 
     return items.map((e) => ({
-      id: e._id,
+      id: e._id.toString(),
       text: e.text,
-      sender: e.sender._id,
+      sender: e.sender._id.toString(),
     }));
   }
 
@@ -61,12 +61,12 @@ export class MessagesGateway {
   @MessageBody() body: CreateMessageWithConversationDto,
     @ConnectedSocket() client: WebSocketEntity,
   ) {
-    const hasAccess = await this.conversationsService.hasAccess(body.conversation, client.id);
+    const hasAccess = await this.conversationsService.hasAccess(body.conversation, client.userId);
     if (!hasAccess) {
       throw new WsFormatException('Conversation not found');
     }
 
-    const r = await this.create(body.conversation, client.id, body);
+    const r = await this.create(body.conversation, client.userId, body);
     return r;
   }
 
@@ -75,8 +75,8 @@ export class MessagesGateway {
   @MessageBody() body: CreateMessageWithUserDto,
     @ConnectedSocket() client: WebSocketEntity,
   ) {
-    const conversation = await this.findDirectOrCreate(client.id, body.user);
-    const r = await this.create(conversation, client.id, body);
+    const conversation = await this.findDirectOrCreate(client.userId, body.user);
+    const r = await this.create(conversation.toString(), client.userId, body);
     return r;
   }
 

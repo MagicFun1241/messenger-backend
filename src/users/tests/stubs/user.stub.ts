@@ -4,13 +4,14 @@ export const userStub = (): User & { _id: string } => ({
   _id: '507f191e810c19729de860ea',
   firstName: 'Николай',
   lastName: 'Федотов',
-  middleName: null,
+  middleName: undefined,
   userName: 'nphedotov',
-
-  photo: null,
-  tags: [],
-
   email: 'mail@example.com',
+  type: 'userTypeRegular',
+  photos: undefined,
+  isVerified: false,
+  wasOnline: new Date(),
+  tags: [],
   dateOfBirth: new Date(),
   externalAccounts: [{ service: 'volsu', id: '000131678' }],
 });

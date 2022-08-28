@@ -1,11 +1,17 @@
 import { UseFilters, UseGuards } from '@nestjs/common';
-import { MessageBody, SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import {
+  ConnectedSocket,
+  MessageBody,
+  SubscribeMessage,
+  WebSocketGateway,
+} from '@nestjs/websockets';
 
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
 import { AuthWsJwtGuard } from '@/authentication/guards/auth.ws-jwt.guard';
 import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
 
+import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { SearchService } from './search.service';
 
 @UseFilters(WsFilterException)
@@ -22,8 +28,9 @@ export class SearchGateway {
   @SubscribeMessage('search-global-chats')
   async globalSearchHandler(
     @MessageBody() messageBody: string,
+      @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<unknown>> {
-    const searchGlobalChatsResult = await this.searchService.usersSearch(messageBody);
+    const searchGlobalChatsResult = await this.searchService.usersSearch(messageBody, client.userId);
 
     return {
       event: 'search-global-chats',

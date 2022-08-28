@@ -78,7 +78,7 @@ export class ConversationsService {
 
   async hasAccess(conversation: string, user: string) {
     const r = await this.conversationModel.findById(conversation, { members: 1 }).populate('members', ['_id']).exec();
-    return r.members.findIndex((e) => e._id === user) !== -1;
+    return r.members.findIndex((e) => e._id.toString() === user) !== -1;
   }
 
   async hasRights(conversation: string, user: string, role: Role) {

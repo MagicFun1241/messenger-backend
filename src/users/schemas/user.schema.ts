@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 import { Timestamps } from '@/@types/mongoose';
 
-export type UserDocument = User & Document<string> & Timestamps;
+export type UserDocument = User & Document<ObjectId> & Timestamps;
 
 @Schema({ timestamps: true })
 export class User {
@@ -13,10 +13,10 @@ export class User {
     lastName: string;
 
   @Prop()
-    middleName: string;
+    middleName?: string;
 
   @Prop()
-    photo?: string;
+    photos?: string[];
 
   @Prop({ required: true, unique: true })
     userName: string;
@@ -26,6 +26,19 @@ export class User {
 
   @Prop({ required: true })
     dateOfBirth: Date;
+
+  @Prop({ required: true })
+    type: 'userTypeBot' | 'userTypeRegular'
+  | 'userTypeDeleted' | 'userTypeUnLinked' | 'userTypeUnknown';
+
+  @Prop({ required: true, default: new Date() })
+    wasOnline: Date;
+
+  @Prop({ required: true, default: false })
+    isVerified: boolean;
+
+  @Prop()
+    phoneNumber?: string;
 
   @Prop({ default: [] })
     tags?: Array<string>;

@@ -1,7 +1,9 @@
 import { WebSocket } from 'ws';
 
 export class WebSocketEntity extends WebSocket {
-  public id: string;
+  public userId: string | undefined;
+
+  public socketId: string | undefined;
 
   public tokenAccess: string | undefined;
 

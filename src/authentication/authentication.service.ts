@@ -156,9 +156,10 @@ export class AuthenticationService {
       { secret: this.configService.get<string>('TOKEN_ACCESS_SECRET') },
     )) {
       const tokenAccessDecoded = this.jwtService.decode(tokenAccess) as { userId: string };
-      const clientId = this.wsService.setConnectedWebSocketByUserId(tokenAccessDecoded.userId, client);
+      const socketId = this.wsService.setConnectedWebSocketByUserId(tokenAccessDecoded.userId, client);
       client.tokenAccess = tokenAccess;
-      client.id = clientId;
+      client.userId = tokenAccessDecoded.userId;
+      client.socketId = socketId;
       return true;
     }
 
@@ -166,14 +167,8 @@ export class AuthenticationService {
   }
 
   public deleteConnectionFromState(client: WebSocketEntity): boolean {
-    if (client.id && client.tokenAccess) {
-      const tokenAccessDecoded = this.jwtService.decode(client.tokenAccess) as { userId: string };
-
-      if (tokenAccessDecoded) {
-        return this.wsService.deleteConnectedWebSocketByUserIdAndClientId(tokenAccessDecoded.userId, client.id);
-      }
-
-      return false;
+    if (client.socketId && client.tokenAccess) {
+      return this.wsService.deleteConnectedWebSocketByUserIdAndClientId(client.userId, client.socketId);
     }
 
     return false;

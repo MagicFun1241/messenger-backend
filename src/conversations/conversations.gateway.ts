@@ -40,13 +40,13 @@ export class ConversationsGateway {
       };
 
       r.members = item.members.map((e) => ({
-        id: e._id,
+        id: e._id.toString(),
         firstName: e.firstName,
         lastName: e.lastName,
       }));
     } else {
-      r.lastMessage = item.lastMessage._id;
-      r.members = item.members.map((e) => (e._id));
+      r.lastMessage = item.lastMessage._id.toString();
+      r.members = item.members.map((e) => (e._id.toString()));
     }
 
     return r;
@@ -57,13 +57,13 @@ export class ConversationsGateway {
   @MessageBody() body: CreateConversationDto,
     @ConnectedSocket() client: WebSocketEntity,
   ) {
-    const members = !body.members.includes(client.id) ? body.members.concat(client.id) : body.members;
+    const members = !body.members.includes(client.userId) ? body.members.concat(client.userId) : body.members;
 
     if (body.type !== 'group' && body.name != null) {
       delete body.name;
     }
 
-    const doc = await this.conversationsService.create(client.id, {
+    const doc = await this.conversationsService.create(client.userId, {
       type: body.type,
       name: body.name,
       members,
@@ -82,7 +82,7 @@ export class ConversationsGateway {
     body.page = body.page || 1;
     body.count = body.count || 10;
 
-    const items = await this.conversationsService.findByMembers([client.id], {}, {
+    const items = await this.conversationsService.findByMembers([client.userId], {}, {
       extended: body.extended,
       skip: body.page * body.count,
       limit: body.count,
@@ -95,7 +95,7 @@ export class ConversationsGateway {
     @MessageBody() body: FindConversationByIdDto,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<ConversationItem> {
-    const hasAccess = await this.conversationsService.hasAccess(body.id, client.id);
+    const hasAccess = await this.conversationsService.hasAccess(body.id, client.userId);
     if (!hasAccess) {
       throw new WsFormatException('Not found');
     }
@@ -112,7 +112,7 @@ export class ConversationsGateway {
     body.page = body.page || 1;
     body.count = body.count || 10;
 
-    const r = await this.conversationsService.findByMembers([client.id], { $text: { $search: body.value } }, {
+    const r = await this.conversationsService.findByMembers([client.userId], { $text: { $search: body.value } }, {
       extended: body.extended,
       skip: body.page * body.count,
       limit: body.count,
@@ -125,7 +125,7 @@ export class ConversationsGateway {
   @MessageBody() body: UpdateConversationNameDto,
     @ConnectedSocket() client: WebSocketEntity,
   ) {
-    const hasAccess = await this.conversationsService.hasAccess(body.id, client.id);
+    const hasAccess = await this.conversationsService.hasAccess(body.id, client.userId);
     if (!hasAccess) {
       throw new WsFormatException('Not found');
     }

@@ -4,9 +4,12 @@ import { ConfigService } from '@nestjs/config';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { UsersService } from '@/users/users.service';
 
+import { User } from '@/users/schemas/user.schema';
+import { ApiUser } from '@/users/@types/api/users.types';
+
 import {
   ExternalSearchApiResponse,
-  ExternalSearchItem, SearchUserItem,
+  ExternalSearchItem,
 } from './@types/search.types';
 
 @Injectable()
@@ -40,31 +43,38 @@ export class SearchService {
     return searchedUsers;
   }
 
-  async usersSearch(query: string): Promise<Array<SearchUserItem>> {
-    const searchedUsers: Array<SearchUserItem> = [];
+  async usersSearch(query: string, userId: string): Promise<Array<ApiUser>> {
+    const searchedUsers: ApiUser[] = (await this.userService.search(query)).map((localUser) => ({
+      ...localUser as User,
+      id: localUser._id.toString(),
+      isSelf: userId === localUser._id.toString() ? true : undefined,
+    }));
 
     const externalUsers = await this.searchByExternalService(query);
-    const localUsers = await this.userService.search(query);
 
     /**
-     * Remove externalUser if he is linked
+     * Add external user if he don`t find in searchedUsers (local)
      */
-    externalUsers.forEach((externalUser, index) => {
-      const localUserFindResult = localUsers.find(
+    externalUsers.forEach((externalUser) => {
+      const localUserFindResult = searchedUsers.find(
         (localUser) => localUser.externalAccounts
           .find((externalAccount) => externalAccount.service === 'volsu'
             && externalAccount.id === externalUser.externalId),
       );
-      if (localUserFindResult) {
-        externalUsers.splice(index, 1);
-      } else {
+      if (!localUserFindResult) {
         searchedUsers.push({
           id: externalUser.externalId,
-          title: externalUser.title,
-          label: 'NOT_LINKED',
-          avatar: undefined,
-          verified: false,
-          isLinked: false,
+          firstName: externalUser.title,
+          lastName: '',
+          middleName: '',
+          email: '',
+          photos: undefined,
+          userName: undefined,
+          dateOfBirth: new Date(),
+          type: 'userTypeUnLinked',
+          wasOnline: new Date(),
+          isVerified: false,
+          externalAccounts: [{ service: 'volsu', id: externalUser.externalId }],
         });
       }
     });

@@ -23,13 +23,3 @@ export interface ExternalSearchItem {
   externalId: string;
   title: string;
 }
-
-export interface ExternalSearchItemDeprecated {
-  id: string;
-  fullName: string;
-  firstName: string;
-  lastName: string;
-  middleName: string;
-
-  linked: boolean;
-}

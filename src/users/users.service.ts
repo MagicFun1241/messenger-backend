@@ -26,6 +26,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const newUser = new this.UserModel(createUserDto);
     newUser.userName = `user${newUser._id.toString()}`;
+    newUser.type = 'userTypeRegular';
     await newUser.save();
     return newUser;
   }
@@ -47,14 +48,27 @@ export class UsersService {
     return newUser;
   }
 
-  async search(queryText: string, tags: Array<string> = null): Promise<UserDocument[]> {
+  async search(queryText: string, tags: Array<string> = undefined): Promise<UserDocument[]> {
     const aggregationQuery: Array<PipelineStage> = [];
 
-    if (queryText != null && queryText !== '') {
-      aggregationQuery.push({ $match: { $text: { $search: queryText } } });
-    }
+    aggregationQuery.push({
+      $addFields: {
+        fullName: {
+          $concat: ['$lastName', ' ', 'firstName', ' ', '$middleName'],
+        },
+      },
+    });
 
-    if (tags != null) {
+    aggregationQuery.push({
+      $match: {
+        fullName: {
+          $regex: queryText,
+          $options: 'i',
+        },
+      },
+    });
+
+    if (tags) {
       aggregationQuery.unshift({
         $match: {
           tags: { $in: tags },

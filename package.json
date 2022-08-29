@@ -21,7 +21,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./tests/jest-e2e.json"
+    "test:e2e": "jest --config ./tests/jest-e2e.json",
+    "cert:generate": "cd tools\\mkcert\\ && mkcert.exe -cert-file cert.pem -key-file key.pem localhost"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.11",

@@ -5,15 +5,9 @@ export interface ExternalSearchApiResponse {
 
 export interface ExternalSearchApiResult {
   id: string;
-  username: string;
-  firstname: string;
-  lastname: string;
-  middlename: string;
-}
-
-export interface ExternalSearchItem {
-  externalId: string;
-  title: string;
+  firstName: string;
+  lastName: string;
+  middleName: string;
 }
 
 export interface SearchUserItem {

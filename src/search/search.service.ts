@@ -8,8 +8,7 @@ import { User } from '@/users/schemas/user.schema';
 import { ApiUser } from '@/users/@types/api/users.types';
 
 import {
-  ExternalSearchApiResponse,
-  ExternalSearchItem,
+  ExternalSearchApiResponse, ExternalSearchApiResult,
 } from './@types/search.types';
 
 @Injectable()
@@ -21,7 +20,7 @@ export class SearchService {
     private readonly userService: UsersService,
   ) {}
 
-  private async searchByExternalService(query: string): Promise<Array<ExternalSearchItem>> {
+  private async searchByExternalService(query: string): Promise<Array<ExternalSearchApiResult>> {
     const urlSearchParams = new URLSearchParams({
       fullName: query,
       token: this.configService.get('TOKEN_EXTERNAL_SECRET'),
@@ -35,12 +34,7 @@ export class SearchService {
       throw new WsFormatException(`Internal server error. Status ${response.status}`);
     }
 
-    const searchedUsers: Array<ExternalSearchItem> = result.map((user) => ({
-      externalId: user.id,
-      title: user.username,
-    }));
-
-    return searchedUsers;
+    return result;
   }
 
   async usersSearch(query: string, userId: string): Promise<Array<ApiUser>> {
@@ -59,14 +53,14 @@ export class SearchService {
       const localUserFindResult = searchedUsers.find(
         (localUser) => localUser.externalAccounts
           .find((externalAccount) => externalAccount.service === 'volsu'
-            && externalAccount.id === externalUser.externalId),
+            && externalAccount.id === externalUser.id),
       );
       if (!localUserFindResult) {
         searchedUsers.push({
-          id: externalUser.externalId,
-          firstName: externalUser.title,
-          lastName: '',
-          middleName: '',
+          id: externalUser.id,
+          firstName: externalUser.firstName,
+          lastName: externalUser.lastName,
+          middleName: externalUser.middleName,
           email: '',
           photos: undefined,
           userName: undefined,
@@ -74,7 +68,7 @@ export class SearchService {
           type: 'userTypeUnLinked',
           wasOnline: new Date(),
           isVerified: false,
-          externalAccounts: [{ service: 'volsu', id: externalUser.externalId }],
+          externalAccounts: [{ service: 'volsu', id: externalUser.id }],
         });
       }
     });

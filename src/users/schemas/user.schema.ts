@@ -1,8 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId } from 'mongoose';
+import { Document, ObjectId, Types } from 'mongoose';
 import { Timestamps } from '@/@types/mongoose';
+import { ShortNameDocument } from '@/names/schemas/name.schema';
 
 export type UserDocument = User & Document<ObjectId> & Timestamps;
+
+export type UserType = 'userTypeRegular' | 'userTypeDeleted' | 'userTypeUnLinked' | 'userTypeUnknown';
+
+export interface ExternalAccount { service: string, id: string }
 
 @Schema({ timestamps: true })
 export class User {
@@ -15,11 +20,19 @@ export class User {
   @Prop()
     middleName?: string;
 
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'ShortName',
+    required: true,
+    unique: true,
+  })
+    shortName: ShortNameDocument;
+
+  @Prop()
+    phoneNumber?: string;
+
   @Prop()
     photos?: string[];
-
-  @Prop({ required: true, unique: true })
-    userName: string;
 
   @Prop({ required: true, unique: true })
     email: string;
@@ -28,23 +41,19 @@ export class User {
     dateOfBirth: Date;
 
   @Prop({ required: true })
-    type: 'userTypeBot' | 'userTypeRegular'
-  | 'userTypeDeleted' | 'userTypeUnLinked' | 'userTypeUnknown';
+    type: UserType;
 
   @Prop({ required: true, default: new Date() })
-    wasOnline: Date;
+    lastActivity: Date;
 
   @Prop({ required: true, default: false })
-    isVerified: boolean;
-
-  @Prop()
-    phoneNumber?: string;
+    verified: boolean;
 
   @Prop({ default: [] })
     tags?: Array<string>;
 
   @Prop({ required: true })
-    externalAccounts: Array<{ service: string, id: string }>;
+    externalAccounts: Array<ExternalAccount>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

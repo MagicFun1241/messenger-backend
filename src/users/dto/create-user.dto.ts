@@ -1,4 +1,15 @@
-import { OmitType } from '@nestjs/mapped-types';
-import { User } from '../schemas/user.schema';
+import { ExternalAccount, User } from '../schemas/user.schema';
 
-export class CreateUserDto extends OmitType(User, ['userName', 'wasOnline', 'type', 'isVerified'] as const) {}
+export class CreateUserDto {
+  firstName: string;
+
+  lastName: string;
+
+  middleName: string;
+
+  email: string;
+
+  dateOfBirth: Date;
+
+  externalAccounts: Array<ExternalAccount>;
+}

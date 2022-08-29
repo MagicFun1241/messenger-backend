@@ -10,6 +10,7 @@ import { UsersModule } from '@/users/users.module';
 import { AuthenticationModule } from '@/authentication/authentication.module';
 import { WsModule } from '@/ws/ws.module';
 import { SearchModule } from '@/search/search.module';
+import {NamesModule} from "@/names/names.module";
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { SearchModule } from '@/search/search.module';
     ExtensionsModule,
     UsersModule,
     MessagesModule,
+    NamesModule,
     AuthenticationModule,
     ConversationsModule,
     WsModule,

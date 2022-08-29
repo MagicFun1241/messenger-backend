@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { UsersService } from '@/users/users.service';
 
-import { User } from '@/users/schemas/user.schema';
 import { ApiUser } from '@/users/@types/api/users.types';
 
 import {
@@ -37,12 +36,23 @@ export class SearchService {
     return result;
   }
 
-  async usersSearch(query: string, userId: string): Promise<Array<ApiUser>> {
-    const searchedUsers: ApiUser[] = (await this.userService.search(query)).map((localUser) => ({
-      ...localUser as User,
-      id: localUser._id.toString(),
-      isSelf: userId === localUser._id.toString() ? true : undefined,
-    }));
+  async usersSearch(query: string, currentUserId: string): Promise<Array<ApiUser>> {
+    const searchedUsers: ApiUser[] = (await this.userService.search(query)).map((user) => {
+      // В дальнейшем можно будет проверять политику каждого пользователя на возможность его найти
+      if (currentUserId === user._id.toString()) {
+        return null;
+      } return {
+        id: user._id.toString(),
+        firstName: user.firstName,
+        lastName: user.lastName,
+        middleName: user.middleName,
+        userName: user?.shortName?.value,
+
+        verified: user.verified,
+        lastActivity: user.lastActivity,
+        externalAccounts: user.externalAccounts,
+      } as ApiUser;
+    }).filter((e) => e !== null);
 
     const externalUsers = await this.searchByExternalService(query);
 
@@ -58,17 +68,16 @@ export class SearchService {
       if (!localUserFindResult) {
         searchedUsers.push({
           id: externalUser.id,
+          type: 'userTypeUnLinked',
           firstName: externalUser.firstName,
           lastName: externalUser.lastName,
           middleName: externalUser.middleName,
-          email: '',
-          photos: undefined,
-          userName: undefined,
-          dateOfBirth: new Date(),
-          type: 'userTypeUnLinked',
-          wasOnline: new Date(),
-          isVerified: false,
+          userName: '',
+          verified: false,
+          // dateOfBirth: new Date(),
+          lastActivity: new Date(),
           externalAccounts: [{ service: 'volsu', id: externalUser.id }],
+          // tags: [],
         });
       }
     });

@@ -1,9 +1,18 @@
-import { User } from '../../schemas/user.schema';
+import {ExternalAccount, UserType} from '../../schemas/user.schema';
 
-export interface ApiUser extends User {
+export interface ApiUser {
   id: string;
-  isSelf?: true;
+  type: UserType;
+  firstName: string;
+  lastName: string;
+  middleName: string;
   userName: string | undefined;
+
+  verified: boolean;
+
+  externalAccounts: Array<ExternalAccount>;
+
+  lastActivity?: Date;
 }
 
 export interface ApiUserStatus {
@@ -11,7 +20,7 @@ export interface ApiUserStatus {
     'userStatusEmpty' | 'userStatusLastMonth' | 'userStatusLastWeek' |
     'userStatusOffline' | 'userStatusOnline' | 'userStatusRecently'
   );
-  wasOnline?: number;
+  lastActivity?: number;
   expires?: number;
 }
 

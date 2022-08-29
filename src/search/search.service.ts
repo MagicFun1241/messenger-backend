@@ -41,7 +41,9 @@ export class SearchService {
       // В дальнейшем можно будет проверять политику каждого пользователя на возможность его найти
       if (currentUserId === user._id.toString()) {
         return null;
-      } return {
+      }
+
+      return {
         id: user._id.toString(),
         type: user.type,
         firstName: user.firstName,
@@ -57,20 +59,23 @@ export class SearchService {
     /**
      * Add external user if he don`t find in searchedUsers (local)
      */
-    externalUsers.forEach((externalUser) => {
-      const localUserFindResult = searchedUsers.find(
-        (localUser) => localUser.externalAccounts
-          .find((externalAccount) => externalAccount.service === 'volsu'
-            && externalAccount.id === externalUser.id),
-      );
-      if (!localUserFindResult) {
-        searchedUsers.push({
-          id: externalUser.id,
-          type: 'userTypeUnLinked',
-          firstName: externalUser.firstName,
-        });
-      }
-    });
+    if (Array.isArray(externalUsers)) {
+      externalUsers.forEach((externalUser) => {
+        // Тут опасно, надо включить проверку на null
+        const localUserFindResult = searchedUsers.find(
+          (localUser) => (Array.isArray(localUser.externalAccounts) ? localUser.externalAccounts
+            .find((externalAccount) => externalAccount.service === 'volsu'
+              && externalAccount.id === externalUser.id) : false),
+        );
+        if (!localUserFindResult) {
+          searchedUsers.push({
+            id: externalUser.id,
+            type: 'userTypeUnLinked',
+            firstName: externalUser.firstName,
+          });
+        }
+      });
+    }
 
     return searchedUsers;
   }

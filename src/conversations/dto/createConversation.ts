@@ -2,7 +2,7 @@ import { ConversationType } from '@/conversations/schemas/conversation.schema';
 import {
   ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsString, Validate,
 } from 'class-validator';
-import { IsUniqueItemsArray } from '@/validation/unique';
+import { IsUniqueItemsArray } from '@/@global/validation/unique';
 
 export class CreateConversationDto {
   @IsIn(Object.keys(ConversationType))

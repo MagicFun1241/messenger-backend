@@ -1,7 +1,7 @@
 import {
   ArrayMaxSize, IsArray, IsString, Validate,
 } from 'class-validator';
-import { IsUniqueItemsArray } from '@/validation/unique';
+import { IsUniqueItemsArray } from '@/@global/validation/unique';
 
 export class FindByQueryDto {
   @IsString()

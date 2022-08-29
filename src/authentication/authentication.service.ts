@@ -4,9 +4,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Cron, CronExpression } from '@nestjs/schedule';
 
-import dayjs from 'dayjs';
 import { Model } from 'mongoose';
 
 import { UsersService } from '@/users/users.service';
@@ -15,8 +13,6 @@ import { UserDocument } from '@/users/schemas/user.schema';
 import { WsService } from '@/ws/ws.service';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
-
-import { ExtensionsService } from '@/extentions/extensions.service';
 
 import { TokenExternal, TokenExternalDocument } from './schemas/token-external.schema';
 import { Session, SessionDocument } from './schemas/session.schema';

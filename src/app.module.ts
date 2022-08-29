@@ -5,7 +5,6 @@ import { ScheduleModule } from '@nestjs/schedule';
 
 import { MessagesModule } from '@/messages/messages.module';
 import { ConversationsModule } from '@/conversations/conversations.module';
-import { ExtensionsModule } from '@/extentions/extensions.module';
 import { UsersModule } from '@/users/users.module';
 import { AuthenticationModule } from '@/authentication/authentication.module';
 import { WsModule } from '@/ws/ws.module';
@@ -38,7 +37,6 @@ import { NamesModule } from '@/names/names.module';
       inject: [ConfigService],
     }),
 
-    ExtensionsModule,
     UsersModule,
     MessagesModule,
     NamesModule,

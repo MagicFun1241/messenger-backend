@@ -10,7 +10,7 @@ import { WsAdapter } from 'nestjs-ws-binary-adapter';
 // import { WsAdapter } from '@/ws-adapter/ws-adapter.adapter';
 
 import { AppModule } from '@/app.module';
-import { WsValidationPipe } from '@/@global/ws-validation.pipe';
+import { WsValidationPipe } from '@/@global/pipes/ws-validation.pipe';
 
 async function bootstrap() {
   const httpsOptions = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === undefined ? {

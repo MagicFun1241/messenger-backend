@@ -14,12 +14,6 @@ export class User {
   @Prop({ required: true })
     firstName: string;
 
-  @Prop({ required: true })
-    lastName: string;
-
-  @Prop()
-    middleName?: string;
-
   @Prop({
     type: Types.ObjectId,
     ref: 'ShortName',
@@ -28,32 +22,35 @@ export class User {
   })
     shortName: ShortNameDocument;
 
+  @Prop({ required: true })
+    type: UserType;
+
+  @Prop()
+    lastName?: string;
+
+  @Prop({ unique: true })
+    email?: string;
+
   @Prop()
     phoneNumber?: string;
 
   @Prop()
     photos?: string[];
 
-  @Prop({ required: true, unique: true })
-    email: string;
+  @Prop()
+    dateOfBirth?: Date;
 
-  @Prop({ required: true })
-    dateOfBirth: Date;
+  @Prop({ default: new Date() })
+    lastActivity?: Date;
 
-  @Prop({ required: true })
-    type: UserType;
-
-  @Prop({ required: true, default: new Date() })
-    lastActivity: Date;
-
-  @Prop({ required: true, default: false })
-    verified: boolean;
+  @Prop({ default: false })
+    isVerified?: boolean;
 
   @Prop({ default: [] })
     tags?: Array<string>;
 
-  @Prop({ required: true })
-    externalAccounts: Array<ExternalAccount>;
+  @Prop()
+    externalAccounts?: Array<ExternalAccount>;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

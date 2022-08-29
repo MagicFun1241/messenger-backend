@@ -61,7 +61,7 @@ export class UsersService {
     aggregationQuery.push({
       $addFields: {
         fullName: {
-          $concat: ['$lastName', ' ', 'firstName', ' ', '$middleName'],
+          $concat: ['$lastName', ' ', 'firstName'],
         },
       },
     });

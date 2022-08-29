@@ -43,15 +43,13 @@ export class SearchService {
         return null;
       } return {
         id: user._id.toString(),
+        type: user.type,
         firstName: user.firstName,
         lastName: user.lastName,
-        middleName: user.middleName,
         userName: user?.shortName?.value,
-
-        verified: user.verified,
+        isVerified: user.isVerified,
         lastActivity: user.lastActivity,
-        externalAccounts: user.externalAccounts,
-      } as ApiUser;
+      };
     }).filter((e) => e !== null);
 
     const externalUsers = await this.searchByExternalService(query);
@@ -70,14 +68,6 @@ export class SearchService {
           id: externalUser.id,
           type: 'userTypeUnLinked',
           firstName: externalUser.firstName,
-          lastName: externalUser.lastName,
-          middleName: externalUser.middleName,
-          userName: '',
-          verified: false,
-          // dateOfBirth: new Date(),
-          lastActivity: new Date(),
-          externalAccounts: [{ service: 'volsu', id: externalUser.id }],
-          // tags: [],
         });
       }
     });

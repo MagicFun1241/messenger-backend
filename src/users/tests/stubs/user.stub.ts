@@ -4,7 +4,6 @@ export const userStub = (): User & { _id: string } => ({
   _id: '507f191e810c19729de860ea',
   firstName: 'Николай',
   lastName: 'Федотов',
-  middleName: undefined,
   shortName: {
     value: 'nphedotov',
     user: { _id: '507f191e810c19729de860ea' },
@@ -12,7 +11,7 @@ export const userStub = (): User & { _id: string } => ({
   email: 'mail@example.com',
   type: 'userTypeRegular',
   photos: undefined,
-  verified: false,
+  isVerified: false,
   lastActivity: new Date(),
   tags: [],
   dateOfBirth: new Date(),
@@ -23,10 +22,7 @@ export const externalUsersStub = (): any => ({
   volsu: [
     {
       id: '000131678',
-      firstName: 'Николай',
-      lastName: 'Федотов',
-      middleName: null,
-      linked: true,
+      firstName: 'Николай Федотов',
     },
   ],
 });

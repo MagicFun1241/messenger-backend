@@ -1,8 +1,7 @@
 import { User } from '../../schemas/user.schema';
 
-export interface ApiUser extends Omit<User, 'shortName'> {
+export interface ApiUser extends Partial<Pick<User, 'userName'>>, Omit<User, 'userName'> {
   id: string;
-  userName?: string;
 }
 
 export interface ApiUserStatus {

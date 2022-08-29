@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, ObjectId, Types } from 'mongoose';
 import { Timestamps } from '@/@types/mongoose';
-import { ShortNameDocument } from '@/names/schemas/name.schema';
+// import { ShortNameDocument } from '@/names/schemas/name.schema';
 
 export type UserDocument = User & Document<ObjectId> & Timestamps;
 
@@ -14,13 +14,16 @@ export class User {
   @Prop({ required: true })
     firstName: string;
 
-  @Prop({
-    type: Types.ObjectId,
-    ref: 'ShortName',
-    required: true,
-    unique: true,
-  })
-    shortName: ShortNameDocument;
+  @Prop({ required: true })
+    userName: string;
+
+  // @Prop({
+  //   type: Types.ObjectId,
+  //   ref: 'ShortName',
+  //   required: true,
+  //   unique: true,
+  // })
+  //   shortName: ShortNameDocument;
 
   @Prop({ required: true })
     type: UserType;

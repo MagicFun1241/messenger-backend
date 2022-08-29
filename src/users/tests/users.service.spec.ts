@@ -2,8 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
 import { getModelToken } from '@nestjs/mongoose';
 
-import { User, UserDocument } from '@/users/schemas/user.schema';
+import { NamesModule } from '@/names/names.module';
 
+import { User } from '../schemas/user.schema';
 import { UsersService } from '../users.service';
 
 describe('UsersService', () => {

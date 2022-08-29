@@ -4,10 +4,11 @@ export const userStub = (): User & { _id: string } => ({
   _id: '507f191e810c19729de860ea',
   firstName: 'Николай',
   lastName: 'Федотов',
-  shortName: {
-    value: 'nphedotov',
-    user: { _id: '507f191e810c19729de860ea' },
-  } as any,
+  userName: 'nphedotov',
+  // shortName: {
+  //   value: 'nphedotov',
+  //   user: { _id: '507f191e810c19729de860ea' },
+  // } as any,
   email: 'mail@example.com',
   type: 'userTypeRegular',
   photos: undefined,

@@ -45,10 +45,10 @@ export class SearchService {
         id: user._id.toString(),
         type: user.type,
         firstName: user.firstName,
-        lastName: user.lastName,
-        userName: user?.shortName?.value,
-        isVerified: user.isVerified,
-        lastActivity: user.lastActivity,
+        lastName: user?.lastName,
+        userName: user?.userName,
+        isVerified: user?.isVerified,
+        lastActivity: user?.lastActivity,
       };
     }).filter((e) => e !== null);
 

@@ -5,7 +5,7 @@ import { Model, PipelineStage } from 'mongoose';
 
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 
-import { ShortName, ShortNameDocument } from '@/names/schemas/name.schema';
+// import { ShortName, ShortNameDocument } from '@/names/schemas/name.schema';
 import { ExternalAccount, User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ExternalSearchApiResult, ExternalSearchItem } from './@types/users.types';
@@ -16,7 +16,6 @@ export class UsersService {
 
   constructor(
     @InjectModel(User.name) private UserModel: Model<UserDocument>,
-    @InjectModel(ShortName.name) private ShortNameModel: Model<ShortNameDocument>,
     private readonly configService: ConfigService,
   ) {}
 
@@ -27,12 +26,13 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<UserDocument> {
     const newUser = new this.UserModel(createUserDto);
-    const name = await this.ShortNameModel.create({
-      value: `user${newUser._id.toString()}`,
-      user: newUser._id,
-    });
+    // const name = await this.ShortNameModel.create({
+    //   value: `user${newUser._id.toString()}`,
+    //   user: newUser._id,
+    // });
 
-    newUser.shortName = name;
+    // newUser.shortName = name;
+    newUser.userName = `user${newUser._id.toString()}`;
     newUser.type = 'userTypeRegular';
     await newUser.save();
     return newUser;

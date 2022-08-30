@@ -1,17 +1,34 @@
+export interface ApiMessageForwardInfo {
+  date: Date;
+  isChannelPost: boolean;
+  channelPostId?: number;
+  isLinkedChannelPost?: boolean;
+  fromChatId?: string;
+  senderUserId?: string;
+  fromMessageId?: string;
+  hiddenUserName?: string;
+  adminTitle?: string;
+}
+
 export interface ApiMessage {
   id: string;
-  chatId: string;
   content: {
     text?: string;
+    // photo?: ApiPhoto;
+    // video?: ApiVideo;
+    // document?: ApiDocument;
+    // sticker?: ApiSticker;
+    // contact?: ApiContact;
+    // poll?: ApiPoll;
   };
-  date: number;
-  isOutgoing: boolean;
   senderId?: string;
+  date: Date;
+  isOutgoing: boolean;
   replyToChatId?: string;
   replyToMessageId?: number;
   replyToTopMessageId?: number;
   sendingState?: 'messageSendingStatePending' | 'messageSendingStateFailed';
-  // forwardInfo?: ApiMessageForwardInfo;
+  forwardInfo?: ApiMessageForwardInfo;
   isDeleting?: boolean;
   previousLocalId?: number;
   views?: number;

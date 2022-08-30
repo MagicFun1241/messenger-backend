@@ -15,6 +15,36 @@ export interface ApiTypingStatus {
   emoji?: string;
 }
 
+export interface ApiChatFullInfo {
+  about?: string;
+  // onlineCount?: number;
+  // members?: ApiChatMember[];
+  // kickedMembers?: ApiChatMember[];
+  // adminMembers?: ApiChatMember[];
+  // canViewMembers?: boolean;
+  // isPreHistoryHidden?: boolean;
+  // inviteLink?: string;
+  // groupCallId?: string;
+  // slowMode?: {
+  //   seconds: number;
+  //   nextSendDate?: number;
+  // };
+  // migratedFrom?: {
+  //   chatId: string;
+  //   maxMessageId?: number;
+  // };
+  // linkedChatId?: string;
+  // botCommands?: ApiBotCommand[];
+  // enabledReactions?: string[];
+  // sendAsId?: string;
+  // canViewStatistics?: boolean;
+  // recentRequesterIds?: string[];
+  // requestsPending?: number;
+  // statisticsDcId?: number;
+  // stickerSet?: ApiStickerSet;
+  // profilePhoto?: ApiPhoto;
+}
+
 export interface ApiChat extends Chat {
   id: string;
   type: ApiChatType;
@@ -60,8 +90,9 @@ export interface ApiChat extends Chat {
 
   // Obtained from GetChatSettings
   // settings?: ApiChatSettings;
+
   // Obtained from GetFullChat / GetFullChannel
-  // fullInfo?: ApiChatFullInfo;
+  fullInfo?: ApiChatFullInfo;
   // Obtained with UpdateUserTyping or UpdateChatUserTyping updates
   typingStatus?: ApiTypingStatus;
 

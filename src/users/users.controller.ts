@@ -1,5 +1,6 @@
-import {Body, Controller, HttpException, HttpStatus, Post} from '@nestjs/common';
-import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
+import {
+  Body, Controller, HttpException, HttpStatus, Post,
+} from '@nestjs/common';
 import { PrivateCreateUser } from '@/users/dto/privateCreateUser';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '@/users/users.service';

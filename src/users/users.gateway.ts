@@ -5,6 +5,8 @@ import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { ConfigService } from '@nestjs/config';
 
+import { CreateUserDto } from '@/users/dto/create-user.dto';
+import { PrivateCreateUser } from '@/users/dto/privateCreateUser';
 import { UsersService } from './users.service';
 
 import { ExternalSearchQueryDto } from './dto/externalSearchQuery.dto';
@@ -21,6 +23,22 @@ export class UsersGateway {
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
   ) {}
+
+  // Приватный метод для создания пользователей
+  @SubscribeMessage('createUser')
+  async createUser(
+  @MessageBody() body: PrivateCreateUser,
+  ) {
+    if (
+      this.configService.get('PRIVATE_ROUTES_ENABLED') !== 'true'
+      || body.secret !== this.configService.get('PRIVATE_ROUTES_SECRET')
+    ) {
+      throw new WsFormatException('Access denied');
+    }
+
+    const item = await this.usersService.create(body);
+    return { id: item._id.toString() };
+  }
 
   @SubscribeMessage('findUserById')
   async findOneUserHandler(

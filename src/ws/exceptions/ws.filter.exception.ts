@@ -1,13 +1,20 @@
-import { Catch, ArgumentsHost } from '@nestjs/common';
+import { Catch, ArgumentsHost, Logger } from '@nestjs/common';
 import { BaseWsExceptionFilter } from '@nestjs/websockets';
-import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { pack } from 'msgpackr';
+
+import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
+
 import { WsFormatExceptionInterface } from '../interfaces/ws.format-exception.interface';
 
 @Catch()
 export class WsFilterException extends BaseWsExceptionFilter {
+  private readonly logger = new Logger(WsFilterException.name);
+
   catch(exception: { error: WsFormatExceptionInterface, message: string }, host: ArgumentsHost) {
     const client = host.switchToWs().getClient<WebSocketEntity>();
+
+    this.logger.error(`Event: ${exception.error ? exception.error.event : 'unknown'}
+    errors: ${exception.error ? JSON.stringify(exception.error.message) : exception.message}`);
 
     if (exception.error) {
       client.send(pack({

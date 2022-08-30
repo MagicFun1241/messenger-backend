@@ -109,6 +109,10 @@ export class UsersService {
     return searchedUsers;
   }
 
+  async existsWithId(value: string) {
+    return this.UserModel.exists({ _id: value });
+  }
+
   async existsWithExternalId(service: string, id: string) {
     return this.UserModel.exists({ externalAccounts: { $in: [{ service, id }] } });
   }

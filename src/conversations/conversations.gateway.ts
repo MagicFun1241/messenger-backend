@@ -10,6 +10,8 @@ import { FindConversationByIdDto } from '@/conversations/dto/findConversationByI
 import { UpdateConversationNameDto } from '@/conversations/dto/updateConversationName.dto';
 import { FindConversationByNameDto } from '@/conversations/dto/findConversationByName.dto';
 import { GetConversationsDto } from '@/conversations/dto/getConversations.dto';
+import { FindWithUserDto } from '@/conversations/dto/findWithUser.dto';
+import { UsersService } from '@/users/users.service';
 
 interface ConversationItem {
   id?: string;
@@ -23,7 +25,10 @@ interface ConversationItem {
   cors: true,
 })
 export class ConversationsGateway {
-  constructor(private readonly conversationsService: ConversationsService) {}
+  constructor(
+    private readonly conversationsService: ConversationsService,
+    private readonly usersService: UsersService,
+  ) {}
 
   private formatItem(item: ConversationDocument, extended: boolean) {
     const r: ConversationItem = {
@@ -118,6 +123,70 @@ export class ConversationsGateway {
       limit: body.count,
     });
     return r.map((e) => this.formatItem(e, body.extended));
+  }
+
+  @SubscribeMessage('findConversationWithUser')
+  async findWithUser(
+  @MessageBody() body: FindWithUserDto,
+    @ConnectedSocket() client: WebSocketEntity,
+  ) {
+    if (body.externalId != null && body.localId != null) {
+      throw new WsFormatException('Only one id must be passed');
+    }
+
+    let peer: string;
+
+    if (body.externalId != null) {
+      const r = await this.usersService.existsWithExternalId(body.service, body.externalId);
+      if (r == null) {
+        if (body.lastName == null || body.firstName == null) {
+          throw new WsFormatException('Invalid data to create conversation');
+        }
+
+        const searchResults = await this.usersService.searchByExternalService(`${body.firstName} ${body.lastName}`);
+        if (searchResults.length === 0) {
+          throw new WsFormatException('User not found');
+        }
+
+        const user = await this.usersService.create({
+          externalAccounts: [{ service: 'volsu', id: searchResults[0].externalId }],
+          firstName: body.firstName,
+          lastName: body.lastName,
+        });
+
+        peer = user._id.toString();
+      }
+    } else {
+      if (body.localId === client.userId) {
+        throw new WsFormatException('Ids must be different');
+      }
+
+      const found = await this.usersService.existsWithId(body.localId);
+      if (found != null) {
+        throw new WsFormatException('User not found');
+      }
+
+      peer = body.localId;
+    }
+
+    const list = await this.conversationsService.findByMembers([client.userId, peer], {
+      type: ConversationType.direct,
+    });
+
+    const r: ConversationItem = { members: [peer, client.userId], type: ConversationType.direct };
+
+    if (list == null || list.length === 0) {
+      const created = await this.conversationsService.create(client.userId, {
+        type: ConversationType.direct,
+        members: [client.userId, peer],
+      });
+
+      r.id = created._id.toString();
+    } else {
+      r.id = list[0]._id.toString();
+    }
+
+    return r;
   }
 
   @SubscribeMessage('updateConversationName')

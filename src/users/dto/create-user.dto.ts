@@ -3,13 +3,13 @@ import { ExternalAccount, User } from '../schemas/user.schema';
 export class CreateUserDto {
   firstName: string;
 
-  lastName: string;
+  lastName?: string;
 
-  middleName: string;
+  middleName?: string;
 
-  email: string;
+  email?: string;
 
-  dateOfBirth: Date;
+  dateOfBirth?: Date;
 
   externalAccounts: Array<ExternalAccount>;
 }

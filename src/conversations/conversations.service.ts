@@ -37,7 +37,7 @@ export class ConversationsService {
     members: string[],
     additional: FilterQuery<ConversationDocument> = {},
     options = { extended: false, skip: 0, limit: 10 },
-  ) {
+  ): Promise<Array<ConversationDocument>> {
     return this.cut<Array<ConversationDocument>>(
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       this.conversationModel.find({ ...additional, members: { $in: members } }).skip(options.skip).limit(options.limit),

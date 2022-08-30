@@ -19,7 +19,7 @@ export class SearchService {
     private readonly userService: UsersService,
   ) {}
 
-  private async searchByExternalService(query: string): Promise<Array<ExternalSearchApiResult>> {
+  private async searchUsersByExternalService(query: string): Promise<Array<ExternalSearchApiResult>> {
     const urlSearchParams = new URLSearchParams({
       fullName: query,
       token: this.configService.get('TOKEN_EXTERNAL_SECRET'),
@@ -54,7 +54,7 @@ export class SearchService {
       };
     }).filter((e) => e !== null);
 
-    const externalUsers = await this.searchByExternalService(query);
+    const externalUsers = await this.searchUsersByExternalService(query);
 
     /**
      * Add external user if he don`t find in searchedUsers (local)

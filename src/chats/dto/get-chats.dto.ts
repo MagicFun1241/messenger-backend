@@ -3,7 +3,7 @@ import {
   IsInt, IsNotEmpty, Max, Min,
 } from 'class-validator';
 
-export class GetConversationsDto {
+export class GetChatsDto {
   @IsInt()
   @Min(1)
   @Max(20)

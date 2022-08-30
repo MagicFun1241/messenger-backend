@@ -11,13 +11,13 @@ import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 
 import { ChatsService } from './chats.service';
-import { ChatDocument } from './schemas/chats.schema';
 
 import { CreateConversationDto } from './dto/createConversation';
-import { FindConversationByIdDto } from './dto/findConversationById.dto';
 import { UpdateConversationNameDto } from './dto/updateConversationName.dto';
 import { FindConversationByNameDto } from './dto/findConversationByName.dto';
 import { GetChatByUserDto } from './dto/get-chat-by-user.dto';
+import { GetChatByIdDto } from './dto/get-chat-by-id.dto';
+import { GetChatsDto } from './dto/get-chats.dto';
 
 @UseFilters(WsFilterException)
 @UseGuards(AuthWsJwtGuard)
@@ -56,6 +56,70 @@ export class ChatsGateway {
   //   return r;
   // }
 
+  @MessageMetaData('get-chat-id-by-user')
+  @SubscribeMessage('get-chat-id-by-user')
+  async onGetChatByUserHandler(
+    @MessageBody() body: GetChatByUserDto,
+      @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<WsResponse<string>> {
+    const chatId = await this.chatsService.getPrivateChatIdByUsers(
+      body,
+      client.userId,
+      'get-chat-id-by-user',
+    );
+
+    return {
+      event: 'get-chat-id-by-user',
+      data: {
+        status: true,
+        data: chatId,
+      },
+    };
+  }
+
+  @MessageMetaData('get-chat-by-id')
+  @SubscribeMessage('get-chat-by-id')
+  async onGetChatByIdHandler(
+    @MessageBody() body: GetChatByIdDto,
+      @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<WsResponse<unknown>> {
+    const hasAccess = await this.chatsService.hasAccess(body.id, client.userId);
+    if (!hasAccess) {
+      throw new WsFormatException('Not found');
+    }
+
+    const chat = await this.chatsService.findById(body.id, { extended: body.extended });
+
+    return {
+      event: 'get-chat-by-id',
+      data: {
+        status: true,
+        data: chat,
+      },
+    };
+  }
+
+  @MessageMetaData('get-chats')
+  @SubscribeMessage('get-chats')
+  async onGetChats(
+    @MessageBody() body: GetChatsDto,
+      @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<WsResponse<unknown>> {
+    const chats = (await this.chatsService.findByMembers([client.userId], {}, {
+      extended: body.extended,
+      skip: body.page * body.count,
+      limit: body.count,
+    }));
+
+    return {
+      event: 'get-chats',
+      data: {
+        status: true,
+        data: chats,
+      },
+    };
+  }
+
   // @SubscribeMessage('createConversation')
   // async create(
   // @MessageBody() body: CreateConversationDto,
@@ -76,75 +140,6 @@ export class ChatsGateway {
   //   return {
   //     id: doc._id,
   //   };
-  // }
-
-  @MessageMetaData('get-chat-id-by-user')
-  @SubscribeMessage('get-chat-id-by-user')
-  async onGetChatByUserHandler(
-    @MessageBody() body: GetChatByUserDto,
-      @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<WsResponse<string>> {
-    const getChatByUserResult = await this.chatsService.getPrivateChatIdByUsers(
-      body,
-      client.userId,
-      'get-chat-id-by-user',
-    );
-
-    return {
-      event: 'get-chat-id-by-user',
-      data: {
-        status: true,
-        data: getChatByUserResult,
-      },
-    };
-  }
-
-  // TODO: реализовать получение чатов для infinity scroll
-  @MessageMetaData('get-chats')
-  @SubscribeMessage('get-chats')
-  async onGetChats(
-    @MessageBody() body: GetChatByUserDto,
-      @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<WsResponse<unknown>> {
-    const getChatByUserResult = await this.chatsService.getChats(client.userId);
-
-    return {
-      event: 'get-chats',
-      data: {
-        status: true,
-        data: getChatByUserResult,
-      },
-    };
-  }
-
-  // @SubscribeMessage('getConversations')
-  // async getList(
-  // @MessageBody() body: GetConversationsDto,
-  //   @ConnectedSocket() client: WebSocketEntity,
-  // ) {
-  //   body.page = body.page || 1;
-  //   body.count = body.count || 10;
-  //
-  //   const items = await this.conversationsService.findByMembers([client.userId], {}, {
-  //     extended: body.extended,
-  //     skip: body.page * body.count,
-  //     limit: body.count,
-  //   });
-  //   return items.map((e) => this.formatItem(e, body.extended));
-  // }
-
-  // @SubscribeMessage('findConversationById')
-  // async findById(
-  //   @MessageBody() body: FindConversationByIdDto,
-  //     @ConnectedSocket() client: WebSocketEntity,
-  // ): Promise<ConversationItem> {
-  //   const hasAccess = await this.conversationsService.hasAccess(body.id, client.userId);
-  //   if (!hasAccess) {
-  //     throw new WsFormatException('Not found');
-  //   }
-  //
-  //   const item = await this.conversationsService.findById(body.id, { extended: body.extended });
-  //   return this.formatItem(item, body.extended);
   // }
 
   // @SubscribeMessage('findConversationsByName')

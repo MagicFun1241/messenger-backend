@@ -20,10 +20,10 @@ export enum ChatTypeEnum {
 }
 
 export interface ChatMember {
-  userId: string;
+  userId: Types.ObjectId;
   joinedDate?: Date;
-  inviterId?: string;
-  kickedByUserId?: string;
+  inviterId?: Types.ObjectId;
+  kickedByUserId?: Types.ObjectId;
 }
 
 export enum ChatPrivacy {

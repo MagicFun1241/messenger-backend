@@ -23,27 +23,29 @@ export class ChatsService {
     private readonly usersService: UsersService,
   ) {}
 
-  private cut<T>(query: Query<T, any>, extended: boolean) {
+  private static async cut<T>(query: Query<unknown, unknown, unknown, T>, extended: boolean) {
     if (extended) {
-      return query
+      const result = await query
         .populate('lastMessage', ['_id', 'sender', 'text'])
         .populate('members', ['_id', 'firstName', 'lastName'])
         .exec();
+      return result;
     }
-    return query
+    const result = await query
       .populate('lastMessage', ['_id'])
       .populate('members', ['_id'])
       .exec();
+    return result;
   }
 
   async findById(id: string, options: {
     extended?: boolean;
   } = { extended: false }) {
-    return this.cut<ChatDocument>(
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const result = await ChatsService.cut<ChatDocument>(
       this.chatModel.findById(id, { name: 1, members: 1, lastMessage: 1 }),
       options.extended,
     );
+    return result;
   }
 
   async findByMembers(
@@ -88,22 +90,18 @@ export class ChatsService {
     return c.type;
   }
 
-  // async hasAccess(conversation: string, user: string) {
-  //   const r = await this.chatModel.findById(
-  //     conversation,
-  //     { members: 1 },
-  //   ).populate('members', ['_id']).exec();
-  //   return r.members.findIndex((e) => e._id.toString() === user) !== -1;
-  // }
+  async hasAccess(chat: string, userId: string): Promise<boolean> {
+    const chatFounded = await this.chatModel.findById(
+      chat,
+      { members: 1 },
+    ).exec();
+    return chatFounded.members.findIndex((chatMember) => chatMember.userId.toString() === userId) !== -1;
+  }
 
   // async hasRights(conversation: string, user: string, role: Role) {
   //   const r = await this.conversationModel.findById(conversation, { roles: 1 }).exec();
   //   return r.roles.find((e) => e.user === user)?.value >= role;
   // }
-
-  async getChats(currentUserId: string) {
-    return '';
-  }
 
   async getPrivateChatIdByUsers(user: GetChatByUserDto, currentUserId: string, evenName: string): Promise<string> {
     let foundedUserId: string;

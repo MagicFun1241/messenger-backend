@@ -1,6 +1,6 @@
 import { IsBoolean, IsNotEmpty } from 'class-validator';
 
-export class FindConversationByIdDto {
+export class GetChatByIdDto {
   @IsNotEmpty()
     id: string;
 

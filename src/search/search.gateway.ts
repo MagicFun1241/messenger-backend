@@ -6,6 +6,8 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 
+import { ApiUser } from '@/users/@types/api/users.types';
+
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
 import { AuthWsJwtGuard } from '@/authentication/guards/auth.ws-jwt.guard';
 import { WsResponse } from '@/ws/interfaces/ws.response.interface';
@@ -24,13 +26,30 @@ export class SearchGateway {
     private readonly searchService: SearchService,
   ) {}
 
+  @MessageMetaData('search-global-users')
+  @SubscribeMessage('search-global-users')
+  async globalSearchUsersHandler(
+    @MessageBody() messageBody: string,
+      @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<WsResponse<ApiUser[]>> {
+    const searchGlobalUsersResult = await this.searchService.usersSearch(messageBody, client.userId);
+
+    return {
+      event: 'search-global-users',
+      data: {
+        status: true,
+        data: searchGlobalUsersResult,
+      },
+    };
+  }
+
   @MessageMetaData('search-global-chats')
   @SubscribeMessage('search-global-chats')
-  async globalSearchHandler(
+  async globalSearchChatsHandler(
     @MessageBody() messageBody: string,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<unknown>> {
-    const searchGlobalChatsResult = await this.searchService.usersSearch(messageBody, client.userId);
+    const searchGlobalChatsResult = [];
 
     return {
       event: 'search-global-chats',

@@ -1,13 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Query } from 'mongoose';
+import {
+  FilterQuery, Model, Query,
+} from 'mongoose';
 
 import { UsersService } from '@/users/users.service';
 
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 
 import {
-  Chat, ChatDocument, ChatMember,
+  Chat, ChatDocument,
 } from './schemas/chats.schema';
 
 import { GetChatByUserDto } from './dto/get-chat-by-user.dto';
@@ -45,11 +47,15 @@ export class ChatsService {
   }
 
   async findByMembers(
-    members: ChatMember[],
+    members: Array<string>,
     additional: FilterQuery<ChatDocument> = {},
     options = { extended: false, skip: 0, limit: 10 },
   ): Promise<Array<ChatDocument>> {
-    return this.chatModel.find({ ...additional, members: { $in: members } }).skip(options.skip).limit(options.limit);
+    const result = await this.chatModel.find({ ...additional, 'members.userId': members })
+      .skip(options.skip)
+      .limit(options.limit)
+      .exec();
+    return result;
   }
 
   // async create(creator: string, data: {
@@ -116,11 +122,10 @@ export class ChatsService {
       throw new WsFormatException({ event: evenName, message: 'User not found' });
     }
 
-    let [foundedChat] = await this.findByMembers([{ userId: currentUserId }, { userId: foundedUserId }], {
-      type: 'chatTypePrivate',
-    });
-
-    this.logger.log(`id1: ${currentUserId}, id2: ${foundedUserId}`);
+    let [foundedChat] = await this.findByMembers(
+      [currentUserId, foundedUserId],
+      { type: 'chatTypePrivate' },
+    );
 
     if (!foundedChat) {
       foundedChat = await this.chatModel.create({

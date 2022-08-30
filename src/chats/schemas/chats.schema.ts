@@ -37,12 +37,12 @@ export class Chat {
   @Prop({ required: true })
     type: ChatType;
 
-  @Prop(raw({
-    userId: { type: [{ type: Types.ObjectId, ref: 'User' }], required: true },
+  @Prop(raw([{
+    userId: { type: Types.ObjectId, ref: 'User', required: true },
     joinedDate: { type: Date },
-    inviterId: { type: [{ type: Types.ObjectId, ref: 'User' }] },
-    kickedByUserId: { type: [{ type: Types.ObjectId, ref: 'User' }] },
-  }))
+    inviterId: { type: Types.ObjectId, ref: 'User' },
+    kickedByUserId: { type: Types.ObjectId, ref: 'User' },
+  }]))
     members: Array<ChatMember>;
 
   @Prop()

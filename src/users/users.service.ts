@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { Model, PipelineStage } from 'mongoose';
@@ -14,6 +14,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   private allowedTags = new Set<string>();
 
   constructor(
@@ -50,6 +52,7 @@ export class UsersService {
 
   async findByExternalIdOrCreate(createUserDto: CreateUserDto): Promise<UserDocument> {
     const user = await this.findByExternalId(createUserDto.externalAccounts[0]);
+
     if (user) {
       return user;
     }

@@ -83,7 +83,10 @@ export class ChatsService {
   }
 
   // async hasAccess(conversation: string, user: string) {
-  //   const r = await this.conversationModel.findById(conversation, { members: 1 }).populate('members', ['_id']).exec();
+  //   const r = await this.chatModel.findById(
+  //     conversation,
+  //     { members: 1 },
+  //   ).populate('members', ['_id']).exec();
   //   return r.members.findIndex((e) => e._id.toString() === user) !== -1;
   // }
 

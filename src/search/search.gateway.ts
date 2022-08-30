@@ -29,10 +29,10 @@ export class SearchGateway {
   @MessageMetaData('search-global-users')
   @SubscribeMessage('search-global-users')
   async globalSearchUsersHandler(
-    @MessageBody() messageBody: string,
+    @MessageBody() body: string,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<ApiUser[]>> {
-    const searchGlobalUsersResult = await this.searchService.usersSearch(messageBody, client.userId);
+    const searchGlobalUsersResult = await this.searchService.usersSearch(body, client.userId);
 
     return {
       event: 'search-global-users',
@@ -46,7 +46,7 @@ export class SearchGateway {
   @MessageMetaData('search-global-chats')
   @SubscribeMessage('search-global-chats')
   async globalSearchChatsHandler(
-    @MessageBody() messageBody: string,
+    @MessageBody() body: string,
       @ConnectedSocket() client: WebSocketEntity,
   ): Promise<WsResponse<unknown>> {
     const searchGlobalChatsResult = [];

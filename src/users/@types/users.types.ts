@@ -10,16 +10,3 @@ export interface UserItem {
 
   policy?: any;
 }
-
-export interface ExternalSearchApiResult {
-  id: string;
-  username: string;
-  firstname: string;
-  lastname: string;
-  middlename: string;
-}
-
-export interface ExternalSearchItem {
-  externalId: string;
-  title: string;
-}

@@ -13,7 +13,7 @@ import { ExternalSearchQueryDto } from './dto/externalSearchQuery.dto';
 import { UpdateMeDto } from './dto/updateMe.dto';
 import { FindByQueryDto } from './dto/findByQuery.dto';
 import { FindByIdDto } from './dto/findById.dto';
-import { ExternalSearchItem, UserItem } from './@types/users.types';
+import { UserItem } from './@types/users.types';
 
 @WebSocketGateway(8080, {
   cors: true,
@@ -91,19 +91,5 @@ export class UsersGateway {
       lastName: e.lastName,
       tags: e.tags,
     }));
-  }
-
-  @SubscribeMessage('findExternalUsersByQuery')
-  async externalSearch(
-    @MessageBody() body: ExternalSearchQueryDto,
-  ): Promise<
-      WsResponse<Array<ExternalSearchItem>>
-      > {
-    const externalSearchResult = await this.usersService.searchByExternalService(body.query);
-
-    return {
-      event: 'get-access-token',
-      data: externalSearchResult,
-    };
   }
 }

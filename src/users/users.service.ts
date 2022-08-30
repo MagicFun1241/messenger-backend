@@ -3,12 +3,14 @@ import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
 import { Model, PipelineStage } from 'mongoose';
 
+import { ExternalServiceApiResponse } from '@/@types/externalService';
+import { UserExternal } from '@/users/@types/usersExternal.types';
+
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 
 // import { ShortName, ShortNameDocument } from '@/names/schemas/name.schema';
 import { ExternalAccount, User, UserDocument } from './schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
-import { ExternalSearchApiResult, ExternalSearchItem } from './@types/users.types';
 
 @Injectable()
 export class UsersService {
@@ -87,30 +89,26 @@ export class UsersService {
     return users;
   }
 
-  async searchByExternalService(query: string): Promise<Array<ExternalSearchItem>> {
+  async externalFindUserById(externalId: string) {
     const urlSearchParams = new URLSearchParams({
-      fullName: query,
-      token: this.configService.get('TOKEN_LK'),
-      env: process.env.NODE_ENV,
+      id: externalId,
+      token: this.configService.get('TOKEN_EXTERNAL_SECRET'),
+      env: process.env.NODE_ENV || 'development',
     }).toString();
 
-    const response = await fetch(`https://dev.lk.volsu.ru/search/find-users-by-full-name?${urlSearchParams}`);
-    const result = await response.json() as Array<ExternalSearchApiResult>;
+    const response = await fetch(`https://dev.lk.volsu.ru/search/find-user-by-id?${urlSearchParams}`);
+    const { result } = await response.json() as ExternalServiceApiResponse<Pick<UserExternal, 'id' | 'firstName'>>;
 
     if (response.status > 201) {
-      throw new WsFormatException('Internal server error');
+      throw new WsFormatException(`Internal server error. Status ${response.status}`);
     }
 
-    const searchedUsers: Array<ExternalSearchItem> = result.map((user) => ({
-      externalId: user.id,
-      title: user.username,
-    }));
-
-    return searchedUsers;
+    return result;
   }
 
   async existsWithId(value: string) {
-    return this.UserModel.exists({ _id: value });
+    const result = await this.UserModel.exists({ _id: value }).exec();
+    return result;
   }
 
   async existsWithExternalId(service: string, id: string) {

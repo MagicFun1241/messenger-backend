@@ -76,7 +76,6 @@ export class AuthenticationService {
     const user = await this.userService.findByExternalIdOrCreate({
       firstName: 'Test',
       lastName: 'Test',
-      middleName: 'Test',
       email: 'test@test.com',
       dateOfBirth: new Date(),
       externalAccounts: [{ service: 'volsu', id: '1' }],

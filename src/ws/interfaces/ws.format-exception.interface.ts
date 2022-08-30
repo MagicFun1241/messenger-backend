@@ -1,8 +1,8 @@
 export interface WsFormatExceptionInterface {
   event: string,
-  code: number,
+  code?: number,
   message: WsFormatExceptionErrorsInterface[] | string,
-  isCloseWs: boolean,
+  isCloseWs?: true,
 }
 
 export interface WsFormatExceptionErrorsInterface {

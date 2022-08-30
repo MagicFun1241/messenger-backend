@@ -1,12 +1,13 @@
-import { ConversationType } from '@/conversations/schemas/conversation.schema';
+import { ChatTypeEnum } from '@/chats/schemas/chats.schema';
+
 import {
   ArrayMaxSize, ArrayMinSize, IsArray, IsIn, IsString, Validate,
 } from 'class-validator';
 import { IsUniqueItemsArray } from '@/@global/validation/unique';
 
 export class CreateConversationDto {
-  @IsIn(Object.keys(ConversationType))
-    type: ConversationType;
+  @IsIn(Object.keys(ChatTypeEnum))
+    type: ChatTypeEnum;
 
   @IsString()
     name?: string;

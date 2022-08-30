@@ -18,7 +18,7 @@ export class WsFilterException extends BaseWsExceptionFilter {
         },
       }));
 
-      if (exception.error.isCloseWs) {
+      if (exception.error.isCloseWs && exception.error.code) {
         client.close(exception.error.code);
       }
     } else {

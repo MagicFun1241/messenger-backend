@@ -91,11 +91,13 @@ export class ChatsService {
   }
 
   async hasAccess(chat: string, userId: string): Promise<boolean> {
-    const chatFounded = await this.chatModel.findById(
+    const isAccess = (await this.chatModel.findById(
       chat,
       { members: 1 },
-    ).exec();
-    return chatFounded.members.findIndex((chatMember) => chatMember.userId.toString() === userId) !== -1;
+    ).exec()).members
+      .findIndex((chatMember) => chatMember.userId.toString() === userId) !== -1;
+
+    return isAccess;
   }
 
   // async hasRights(conversation: string, user: string, role: Role) {

@@ -92,6 +92,10 @@ export class ChatsService {
   //   return r.roles.find((e) => e.user === user)?.value >= role;
   // }
 
+  async getChats(currentUserId: string) {
+    return '';
+  }
+
   async getPrivateChatIdByUsers(user: GetChatByUserDto, currentUserId: string, evenName: string): Promise<string> {
     let foundedUserId: string;
 

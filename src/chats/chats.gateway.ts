@@ -99,6 +99,24 @@ export class ChatsGateway {
     };
   }
 
+  // TODO: реализовать получение чатов для infinity scroll
+  @MessageMetaData('get-chats')
+  @SubscribeMessage('get-chats')
+  async onGetChats(
+    @MessageBody() body: GetChatByUserDto,
+      @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<WsResponse<unknown>> {
+    const getChatByUserResult = await this.chatsService.getChats(client.userId);
+
+    return {
+      event: 'get-chats',
+      data: {
+        status: true,
+        data: getChatByUserResult,
+      },
+    };
+  }
+
   // @SubscribeMessage('getConversations')
   // async getList(
   // @MessageBody() body: GetConversationsDto,

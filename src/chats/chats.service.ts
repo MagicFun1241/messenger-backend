@@ -21,21 +21,6 @@ export class ChatsService {
     private readonly usersService: UsersService,
   ) {}
 
-  // Можно закинуть в интерсептор
-  formattingChatDocumentToApiChat(chat: ChatDocument): ApiChat {
-    return {
-      id: chat._id.toString(),
-      type: chat.type,
-      title: chat.title,
-      fullInfo: {
-        about: chat.about,
-        members: chat.members.map((chatMember) => ({
-          userId: chatMember.userId.toString(),
-        })),
-      },
-    };
-  }
-
   private static async cut<T>(query: Query<unknown, unknown, unknown, T>, extended: boolean) {
     if (extended) {
       const result = await query

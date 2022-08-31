@@ -1,7 +1,9 @@
 import {
   ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway,
 } from '@nestjs/websockets';
-import { Logger, UseFilters, UseGuards } from '@nestjs/common';
+import {
+  Logger, UseFilters, UseGuards, UseInterceptors,
+} from '@nestjs/common';
 
 import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
@@ -12,6 +14,7 @@ import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 
 import { ChatsService } from './chats.service';
 import { ChatDocument } from './schemas/chats.schema';
+import { ChatsApiFormattingInterceptor } from './interceptors/chats-api-formatting.interceptor';
 
 import { CreateConversationDto } from './dto/createConversation';
 import { UpdateConversationNameDto } from './dto/updateConversationName.dto';
@@ -19,8 +22,6 @@ import { FindConversationByNameDto } from './dto/findConversationByName.dto';
 import { GetChatByUserDto } from './dto/get-chat-by-user.dto';
 import { GetChatByIdDto } from './dto/get-chat-by-id.dto';
 import { GetChatsDto } from './dto/get-chats.dto';
-
-import { ApiChat } from './@types/api/chats.type';
 
 @UseFilters(WsFilterException)
 @UseGuards(AuthWsJwtGuard)
@@ -55,12 +56,13 @@ export class ChatsGateway {
     };
   }
 
+  @UseInterceptors(ChatsApiFormattingInterceptor)
   @MessageMetaData('get-chat-by-id')
   @SubscribeMessage('get-chat-by-id')
   async onGetChatByIdHandler(
     @MessageBody() body: GetChatByIdDto,
       @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<WsResponse<ApiChat>> {
+  ): Promise<WsResponse<ChatDocument>> {
     const hasAccess = await this.chatsService.hasAccess(body.id, client.userId);
     if (!hasAccess) {
       throw new WsFormatException('Not found');
@@ -72,7 +74,7 @@ export class ChatsGateway {
       event: 'get-chat-by-id',
       data: {
         status: true,
-        data: this.chatsService.formattingChatDocumentToApiChat(chat),
+        data: chat,
       },
     };
   }

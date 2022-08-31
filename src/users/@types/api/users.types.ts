@@ -24,26 +24,4 @@ export interface ApiUserFullInfo {
   profilePhoto?: string;
 }
 
-// export interface User {
-//   id: string;
-//   isVerified?: true;
-//   isPremium?: boolean;
-//   type: ApiUserType;
-//   firstName?: string;
-//   lastName?: string;
-//   username: string;
-//   phoneNumber?: string;
-//   hasVideoAvatar?: boolean;
-//   photos?: string[];
-//   botPlaceholder?: string;
-//   canBeInvitedToGroup?: boolean;
-//   commonChats?: {
-//     ids: string[];
-//     maxId: string;
-//     isFullyLoaded: boolean;
-//   };
-//   fakeType?: ApiFakeType;
-//   isAttachMenuBot?: boolean;
-//
-//   fullInfo?: ApiUserFullInfo;
-// }
+export type ApiUserSearch = Partial<Pick<ApiUser, 'id'>> & Omit<ApiUser, 'id'>;

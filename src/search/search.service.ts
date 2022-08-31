@@ -6,7 +6,7 @@ import { UsersService } from '@/users/users.service';
 
 import { ExternalServiceApiResponse } from '@/@types/externalService';
 import { UserExternal } from '@/users/@types/usersExternal.types';
-import { ApiUser } from '@/users/@types/api/users.types';
+import { ApiUserSearch } from '@/users/@types/api/users.types';
 
 @Injectable()
 export class SearchService {
@@ -35,8 +35,8 @@ export class SearchService {
     return result;
   }
 
-  async usersSearch(query: string, currentUserId: string): Promise<Array<ApiUser>> {
-    const searchedUsers: ApiUser[] = (await this.userService.search(query)).map((user) => {
+  async usersSearch(query: string, currentUserId: string): Promise<Array<ApiUserSearch>> {
+    const searchedUsers: ApiUserSearch[] = (await this.userService.search(query)).map((user) => {
       // В дальнейшем можно будет проверять политику каждого пользователя на возможность его найти
       if (currentUserId === user._id.toString()) {
         return null;
@@ -70,7 +70,6 @@ export class SearchService {
           );
           if (!localUserFindResult) {
             searchedUsers.push({
-              id: externalUser.id,
               type: 'userTypeUnLinked',
               firstName: externalUser.firstName,
               externalAccounts: [{ id: externalUser.id, service: 'volsu' }],

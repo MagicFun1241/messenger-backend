@@ -105,21 +105,40 @@ export class ChatsService {
   //   return r.roles.find((e) => e.user === user)?.value >= role;
   // }
 
-  async getPrivateChatIdByUsers(user: GetChatByUserDto, currentUserId: string, evenName: string): Promise<string> {
+  async getPrivateChatIdByUsers(user: GetChatByUserDto, currentUserId: string, eventName: string): Promise<string> {
     let foundedUserId: string;
 
-    if (user.type === 'userTypeUnLinked') {
-      const externalUser = await this.usersService.externalFindUserById(user.id);
+    const localIdPassed = user.localId != null;
+    const externalIdPassed = user.externalId != null;
+
+    if (localIdPassed && externalIdPassed) {
+      throw new WsFormatException({ event: eventName, message: 'Only one id must be passed' });
+    } else if (!externalIdPassed && !localIdPassed) {
+      throw new WsFormatException({ event: eventName, message: 'At least one id must be passed' });
+    }
+
+    if (externalIdPassed) {
+      const externalUser = await this.usersService.externalFindUserById(user.externalId);
+      if (Array.isArray(externalUser)) {
+        throw new WsFormatException({ event: eventName, message: 'User not found' });
+      }
+
       foundedUserId = (await this.usersService.findByExternalIdOrCreate({
         firstName: externalUser.firstName,
+        email: externalUser.email,
         externalAccounts: [{ service: 'volsu', id: externalUser.id }],
       }))._id.toString();
     } else {
-      foundedUserId = (await this.usersService.existsWithId(user.id)).toString();
+      const found = (await this.usersService.existsWithId(user.localId));
+      if (found == null) {
+        throw new WsFormatException({ event: eventName, message: 'User not found' });
+      }
+
+      foundedUserId = user.localId;
     }
 
     if (!foundedUserId) {
-      throw new WsFormatException({ event: evenName, message: 'User not found' });
+      throw new WsFormatException({ event: eventName, message: 'User not found' });
     }
 
     let [foundedChat] = await this.findByMembers(

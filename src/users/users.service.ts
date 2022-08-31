@@ -100,7 +100,9 @@ export class UsersService {
     }).toString();
 
     const response = await fetch(`https://dev.lk.volsu.ru/search/find-user-by-id?${urlSearchParams}`);
-    const { result } = await response.json() as ExternalServiceApiResponse<Pick<UserExternal, 'id' | 'firstName'>>;
+    const { result } = await response.json() as ExternalServiceApiResponse<
+    Pick<UserExternal, 'id' | 'email' | 'firstName'>
+    >;
 
     if (response.status > 201) {
       throw new WsFormatException(`Internal server error. Status ${response.status}`);

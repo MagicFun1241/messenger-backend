@@ -1,7 +1,7 @@
 import { ApiMessage } from '@/messages/@types/api/messages.type';
 
-import { Chat, ChatMember } from '../../schemas/chats.schema';
 import { Types } from 'mongoose';
+import { Chat, ChatMember } from '../../schemas/chats.schema';
 
 export type ApiChatType = (
   'chatTypePrivate' | 'chatTypeSecret' |

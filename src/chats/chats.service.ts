@@ -1,12 +1,12 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { FilterQuery, Model, Query, } from 'mongoose';
+import { FilterQuery, Model, Query } from 'mongoose';
 
 import { UsersService } from '@/users/users.service';
 
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 
-import { Chat, ChatDocument, } from './schemas/chats.schema';
+import { Chat, ChatDocument } from './schemas/chats.schema';
 
 import { ApiChat } from './@types/api/chats.type';
 

@@ -1,6 +1,7 @@
 import { ApiMessage } from '@/messages/@types/api/messages.type';
 
-import { Chat } from '../../schemas/chats.schema';
+import { Chat, ChatMember } from '../../schemas/chats.schema';
+import { Types } from 'mongoose';
 
 export type ApiChatType = (
   'chatTypePrivate' | 'chatTypeSecret' |
@@ -15,10 +16,17 @@ export interface ApiTypingStatus {
   emoji?: string;
 }
 
+export interface ApiChatMember extends Omit<ChatMember, 'userId'> {
+  userId: string;
+  joinedDate?: Date;
+  inviterId?: Types.ObjectId;
+  kickedByUserId?: Types.ObjectId;
+}
+
 export interface ApiChatFullInfo {
   about?: string;
-  // onlineCount?: number;
-  // members?: ApiChatMember[];
+  onlineCount?: number;
+  members?: ApiChatMember[];
   // kickedMembers?: ApiChatMember[];
   // adminMembers?: ApiChatMember[];
   // canViewMembers?: boolean;
@@ -45,7 +53,7 @@ export interface ApiChatFullInfo {
   // profilePhoto?: ApiPhoto;
 }
 
-export interface ApiChat extends Chat {
+export interface ApiChat extends Omit<Chat, 'members' | 'about'> {
   id: string;
   type: ApiChatType;
 

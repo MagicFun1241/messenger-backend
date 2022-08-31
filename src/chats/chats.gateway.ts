@@ -1,7 +1,7 @@
 import {
   ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway,
 } from '@nestjs/websockets';
-import { UseFilters, UseGuards } from '@nestjs/common';
+import { Logger, UseFilters, UseGuards } from '@nestjs/common';
 
 import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
@@ -11,6 +11,7 @@ import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 
 import { ChatsService } from './chats.service';
+import { ChatDocument } from './schemas/chats.schema';
 
 import { CreateConversationDto } from './dto/createConversation';
 import { UpdateConversationNameDto } from './dto/updateConversationName.dto';
@@ -19,42 +20,19 @@ import { GetChatByUserDto } from './dto/get-chat-by-user.dto';
 import { GetChatByIdDto } from './dto/get-chat-by-id.dto';
 import { GetChatsDto } from './dto/get-chats.dto';
 
+import { ApiChat } from './@types/api/chats.type';
+
 @UseFilters(WsFilterException)
 @UseGuards(AuthWsJwtGuard)
 @WebSocketGateway(8080, {
   cors: true,
 })
 export class ChatsGateway {
+  private readonly logger = new Logger(ChatsGateway.name);
+
   constructor(
     private readonly chatsService: ChatsService,
   ) {}
-
-  // private formatItem(item: ChatDocument, extended: boolean) {
-  //   const r: ChatDocument = {
-  //     type: item.type,
-  //     name: item.name,
-  //   } as any;
-  //
-  //   if (extended) {
-  //     // @ts-ignore
-  //     r.lastMessage = item.lastMessage == null ? undefined : {
-  //       id: item.lastMessage._id,
-  //       text: item.lastMessage.text,
-  //       sender: item.lastMessage.sender._id,
-  //     };
-  //
-  //     r.members = item.members.map((e) => ({
-  //       id: e._id.toString(),
-  //       firstName: e.firstName,
-  //       lastName: e.lastName,
-  //     }));
-  //   } else {
-  //     r.lastMessage = item.lastMessage._id.toString();
-  //     r.members = item.members.map((e) => (e._id.toString()));
-  //   }
-  //
-  //   return r;
-  // }
 
   @MessageMetaData('get-chat-id-by-user')
   @SubscribeMessage('get-chat-id-by-user')
@@ -82,19 +60,19 @@ export class ChatsGateway {
   async onGetChatByIdHandler(
     @MessageBody() body: GetChatByIdDto,
       @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<WsResponse<unknown>> {
+  ): Promise<WsResponse<ApiChat>> {
     const hasAccess = await this.chatsService.hasAccess(body.id, client.userId);
     if (!hasAccess) {
       throw new WsFormatException('Not found');
     }
 
-    const chat = await this.chatsService.findById(body.id, { extended: body.extended });
+    const chat = (await this.chatsService.findById(body.id, { extended: body.extended })) as ChatDocument;
 
     return {
       event: 'get-chat-by-id',
       data: {
         status: true,
-        data: chat,
+        data: this.chatsService.formattingChatDocumentToApiChat(chat),
       },
     };
   }

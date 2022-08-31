@@ -5,5 +5,5 @@ export class GetChatByIdDto {
     id: string;
 
   @IsBoolean()
-    extended: boolean;
+    extended?: boolean;
 }

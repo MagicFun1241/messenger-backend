@@ -2,7 +2,7 @@ import {
   IsNotEmpty, IsString,
 } from 'class-validator';
 
-export class FindByIdDto {
+export class GetUserByIdDto {
   @IsString()
   @IsNotEmpty()
     id: string;

@@ -1,24 +1,35 @@
+import { Logger, UseFilters, UseGuards } from '@nestjs/common';
+
 import {
-  WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket, WsResponse,
+  WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket,
 } from '@nestjs/websockets';
+
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { ConfigService } from '@nestjs/config';
 
-import { CreateUserDto } from '@/users/dto/create-user.dto';
+import { MessageMetaData } from '@/ws/ws.message-meta-data.decorator';
+import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
+import { WsResponse } from '@/ws/interfaces/ws.response.interface';
+import { AuthWsJwtGuard } from '@/authentication/guards/auth.ws-jwt.guard';
 import { PrivateCreateUser } from '@/users/dto/privateCreateUser';
 import { UsersService } from './users.service';
 
-import { ExternalSearchQueryDto } from './dto/externalSearchQuery.dto';
 import { UpdateMeDto } from './dto/updateMe.dto';
 import { FindByQueryDto } from './dto/findByQuery.dto';
-import { FindByIdDto } from './dto/findById.dto';
-import { UserItem } from './@types/users.types';
+import { GetUserByIdDto } from './dto/get-user-by-id.dto';
 
+import { UserItem } from './@types/users.types';
+import { ApiUser } from './@types/api/users.types';
+
+@UseFilters(WsFilterException)
+@UseGuards(AuthWsJwtGuard)
 @WebSocketGateway(8080, {
   cors: true,
 })
 export class UsersGateway {
+  private readonly logger = new Logger(UsersGateway.name);
+
   constructor(
     private readonly configService: ConfigService,
     private readonly usersService: UsersService,
@@ -40,20 +51,28 @@ export class UsersGateway {
     return { id: item._id.toString() };
   }
 
-  @SubscribeMessage('findUserById')
+  @MessageMetaData('get-user-by-id')
+  @SubscribeMessage('get-user-by-id')
   async findOneUserHandler(
-    @MessageBody() body: FindByIdDto,
-  ): Promise<UserItem> {
-    const result = await this.usersService.findById(body.id);
-    if (result == null) {
-      throw new WsFormatException('Not found');
+    @MessageBody() body: GetUserByIdDto,
+  ): Promise<WsResponse<ApiUser>> {
+    const user = await this.usersService.findById(body.id);
+    if (!user) {
+      throw new WsFormatException({ event: 'get-user-by-id', message: 'User not found' });
     }
 
     return {
-      id: result._id.toString(),
-      firstName: result.firstName,
-      lastName: result.lastName,
-      tags: result.tags,
+      event: 'get-user-by-id',
+      data: {
+        status: true,
+        data: {
+          id: user._id.toString(),
+          type: user.type,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          tags: user.tags,
+        },
+      },
     };
   }
 

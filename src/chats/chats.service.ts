@@ -37,7 +37,7 @@ export class ChatsService {
     extended?: boolean;
   } = { extended: false }) {
     const result = await ChatsService.cut<ChatDocument>(
-      this.chatModel.findById(id, { title: 1, type: 1, 'members.userId': 1 }),
+      this.chatModel.findById(id),
       options.extended,
     );
     return result;

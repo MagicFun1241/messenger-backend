@@ -6,7 +6,7 @@ import { UsersGateway } from '../users.gateway';
 import { UsersService } from '../users.service';
 import { User } from '../schemas/user.schema';
 import { userStub } from './stubs/user.stub';
-import { FindByIdDto } from '../dto/findById.dto';
+import { GetUserByIdDto } from '../dto/get-user-by-id.dto';
 
 jest.mock('../users.service');
 
@@ -33,7 +33,7 @@ describe('UsersGateway', () => {
 
   describe('findById', () => {
     describe('When findById is called', () => {
-      let user: FindByIdDto & { id: string };
+      let user: GetUserByIdDto & { id: string };
 
       beforeEach(async () => {
         user = await usersGateway.findOneUserHandler({

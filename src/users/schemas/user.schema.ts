@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, ObjectId, Types } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 import { Timestamps } from '@/@types/mongoose';
 // import { ShortNameDocument } from '@/names/schemas/name.schema';
 

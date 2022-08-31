@@ -53,7 +53,7 @@ export class ChatsService {
     additional: FilterQuery<ChatDocument> = {},
     options = { extended: false, skip: 0, limit: 10 },
   ): Promise<Array<ChatDocument>> {
-    const result = await this.chatModel.find({ ...additional, 'members.userId': members })
+    const result = await this.chatModel.find({ ...additional, 'members.userId': { $all: members } })
       .skip(options.skip)
       .limit(options.limit)
       .exec();
@@ -106,35 +106,27 @@ export class ChatsService {
   // }
 
   async getPrivateChatIdByUsers(user: GetChatByUserDto, currentUserId: string, eventName: string): Promise<string> {
-    let foundedUserId: string;
-
-    const localIdPassed = user.localId != null;
-    const externalIdPassed = user.externalId != null;
-
-    if (localIdPassed && externalIdPassed) {
-      throw new WsFormatException({ event: eventName, message: 'Only one id must be passed' });
-    } else if (!externalIdPassed && !localIdPassed) {
-      throw new WsFormatException({ event: eventName, message: 'At least one id must be passed' });
+    if (!user.id && !user.externalAccounts) {
+      throw new WsFormatException({ event: eventName, message: 'At least one param must be passed' });
     }
 
-    if (externalIdPassed) {
-      const externalUser = await this.usersService.externalFindUserById(user.externalId);
-      if (Array.isArray(externalUser)) {
-        throw new WsFormatException({ event: eventName, message: 'User not found' });
+    let foundedUserId: string;
+    if (user.id) {
+      foundedUserId = (await this.usersService.existsWithId(user.id)).toString();
+    } else {
+      // Workaround, позже сделать коллекцию сервисом, и переписать тут на forEach
+      const externalAccount = user.externalAccounts.find((account) => account.service === 'volsu');
+      if (!externalAccount) {
+        throw new WsFormatException({ event: eventName, message: 'External account not found' });
       }
+
+      const externalUser = await this.usersService.externalFindUserById(externalAccount.id);
 
       foundedUserId = (await this.usersService.findByExternalIdOrCreate({
         firstName: externalUser.firstName,
         email: externalUser.email,
         externalAccounts: [{ service: 'volsu', id: externalUser.id }],
       }))._id.toString();
-    } else {
-      const found = (await this.usersService.existsWithId(user.localId));
-      if (found == null) {
-        throw new WsFormatException({ event: eventName, message: 'User not found' });
-      }
-
-      foundedUserId = user.localId;
     }
 
     if (!foundedUserId) {

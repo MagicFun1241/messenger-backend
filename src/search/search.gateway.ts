@@ -6,7 +6,7 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 
-import { ApiUser } from '@/users/@types/api/users.types';
+import { ApiUserSearch } from '@/users/@types/api/users.types';
 
 import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
 import { AuthWsJwtGuard } from '@/authentication/guards/auth.ws-jwt.guard';
@@ -31,7 +31,7 @@ export class SearchGateway {
   async globalSearchUsersHandler(
     @MessageBody() body: string,
       @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<WsResponse<ApiUser[]>> {
+  ): Promise<WsResponse<ApiUserSearch[]>> {
     const searchGlobalUsersResult = await this.searchService.usersSearch(body, client.userId);
 
     return {

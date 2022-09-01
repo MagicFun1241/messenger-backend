@@ -24,7 +24,7 @@ export class ChatsService {
   private static async cut<T>(query: Query<unknown, unknown, unknown, T>, extended: boolean) {
     if (extended) {
       const result = await query
-        .populate('members.userId', ['_id', 'firstName', 'lastName'])
+        .populate('fullInfo.members.userId', ['_id', 'firstName', 'lastName'])
         .exec();
       return result;
     }
@@ -48,7 +48,7 @@ export class ChatsService {
     additional: FilterQuery<ChatDocument> = {},
     options = { extended: false, skip: 0, limit: 10 },
   ): Promise<Array<ChatDocument>> {
-    const result = await this.chatModel.find({ ...additional, 'members.userId': { $all: members } })
+    const result = await this.chatModel.find({ ...additional, 'fullInfo.members.userId': { $all: members } })
       .skip(options.skip)
       .limit(options.limit)
       .exec();
@@ -89,7 +89,7 @@ export class ChatsService {
     const isAccess = (await this.chatModel.findById(
       chat,
       { members: 1 },
-    ).exec()).members
+    ).exec()).fullInfo.members
       .findIndex((chatMember) => chatMember.userId.toString() === userId) !== -1;
 
     return isAccess;

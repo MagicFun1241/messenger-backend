@@ -3,7 +3,6 @@ import {
 } from '@nestjs/mongoose';
 import { Document, ObjectId, Types } from 'mongoose';
 import { Timestamps } from '@/@types/mongoose';
-import { UserDocument } from '@/users/schemas/user.schema';
 
 // TODO: Оставить одно определение
 export type ChatType = (
@@ -27,6 +26,12 @@ export interface ChatMember {
   kickedByUserId?: Types.ObjectId;
 }
 
+export interface ChatFullInfo {
+  about?: string;
+  onlineCount?: number;
+  members: ChatMember[];
+}
+
 export enum ChatPrivacy {
   public = 'public',
 }
@@ -38,13 +43,17 @@ export class Chat {
   @Prop({ required: true })
     type: ChatType;
 
-  @Prop(raw([{
-    userId: { type: Types.ObjectId, ref: 'User', required: true },
-    joinedDate: { type: Date },
-    inviterId: { type: Types.ObjectId, ref: 'User' },
-    kickedByUserId: { type: Types.ObjectId, ref: 'User' },
-  }]))
-    members: Array<ChatMember>;
+  @Prop(raw({
+    about: { type: String },
+    onlineCount: { type: Number },
+    members: [{
+      userId: { type: Types.ObjectId, ref: 'User', required: true },
+      joinedDate: { type: Date },
+      inviterId: { type: Types.ObjectId, ref: 'User' },
+      kickedByUserId: { type: Types.ObjectId, ref: 'User' },
+    }],
+  }))
+    fullInfo: ChatFullInfo;
 
   @Prop()
     title?: string;

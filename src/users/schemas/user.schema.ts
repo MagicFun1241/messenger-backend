@@ -10,7 +10,7 @@ export type UserType = 'userTypeRegular' | 'userTypeDeleted' | 'userTypeUnLinked
 export interface ExternalAccount { service: string, id: string }
 
 @Schema({ timestamps: true })
-export class User {
+class User {
   @Prop({ required: true })
     firstName: string;
 
@@ -56,4 +56,10 @@ export class User {
     externalAccounts?: Array<ExternalAccount>;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.index({ firstName: 'text', lastName: 'text', userName: 'text' });
+
+export {
+  User,
+  UserSchema,
+};

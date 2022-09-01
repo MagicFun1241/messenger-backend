@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ConfigService } from '@nestjs/config';
-import { Model, PipelineStage } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 
 import { ExternalServiceApiResponse } from '@/@types/externalService';
 import { UserExternal } from '@/users/@types/usersExternal.types';
@@ -61,34 +61,17 @@ export class UsersService {
   }
 
   async search(queryText: string, tags: Array<string> = undefined): Promise<UserDocument[]> {
-    const aggregationQuery: Array<PipelineStage> = [];
-
-    aggregationQuery.push({
-      $addFields: {
-        fullName: {
-          $concat: ['$lastName', ' ', 'firstName'],
-        },
+    const q: FilterQuery<UserDocument> = {
+      $text: {
+        $search: queryText,
       },
-    });
-
-    aggregationQuery.push({
-      $match: {
-        fullName: {
-          $regex: queryText,
-          $options: 'i',
-        },
-      },
-    });
+    };
 
     if (tags) {
-      aggregationQuery.unshift({
-        $match: {
-          tags: { $in: tags },
-        },
-      });
+      q.tags = { $in: tags };
     }
 
-    const users = await this.UserModel.aggregate<UserDocument>(aggregationQuery);
+    const users = await this.UserModel.find<UserDocument>(q);
     return users;
   }
 

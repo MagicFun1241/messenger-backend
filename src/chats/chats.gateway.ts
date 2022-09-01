@@ -15,6 +15,7 @@ import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 import { UserDocument } from '@/users/schemas/user.schema';
 import { ChatsService } from './chats.service';
 import { ChatDocument } from './schemas/chats.schema';
+import { ChatApiFormattingInterceptor } from './interceptors/chat-api-formatting.interceptor';
 import { ChatsApiFormattingInterceptor } from './interceptors/chats-api-formatting.interceptor';
 
 import { CreateConversationDto } from './dto/createConversation';
@@ -57,7 +58,7 @@ export class ChatsGateway {
     };
   }
 
-  @UseInterceptors(ChatsApiFormattingInterceptor)
+  @UseInterceptors(ChatApiFormattingInterceptor)
   @MessageMetaData('get-chat-by-id')
   @SubscribeMessage('get-chat-by-id')
   async onGetChatByIdHandler(
@@ -87,12 +88,13 @@ export class ChatsGateway {
     };
   }
 
+  @UseInterceptors(ChatsApiFormattingInterceptor)
   @MessageMetaData('get-chats')
   @SubscribeMessage('get-chats')
   async onGetChats(
     @MessageBody() body: GetChatsDto,
       @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<WsResponse<unknown>> {
+  ): Promise<WsResponse<ChatDocument[]>> {
     const chats = (await this.chatsService.findByMembers([client.userId], {}, {
       extended: body.extended,
       skip: body.page * body.count,

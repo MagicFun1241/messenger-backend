@@ -9,28 +9,28 @@ import { ChatDocument } from '../schemas/chats.schema';
 import { ApiChat } from '../@types/api/chats.type';
 
 @Injectable()
-export class ChatsApiFormattingInterceptor implements NestInterceptor {
+export class ChatApiFormattingInterceptor implements NestInterceptor {
   intercept(
     context: ExecutionContext,
-    next: CallHandler<WsResponse<ChatDocument[]>>,
-  ): Observable<WsResponse<ApiChat[]>> | Promise<Observable<ApiChat[]>> {
+    next: CallHandler<WsResponse<ChatDocument>>,
+  ): Observable<WsResponse<ApiChat>> | Promise<Observable<ApiChat>> {
     return next
       .handle()
       .pipe(
-        map<WsResponse<ChatDocument[]>, WsResponse<ApiChat[]>>((chats) => ({
-          event: chats.event,
+        map<WsResponse<ChatDocument>, WsResponse<ApiChat>>((chat) => ({
+          event: chat.event,
           data: {
-            status: chats.data.status,
-            data: chats.data.data.map((chat) => ({
-              id: chat._id.toString(),
-              type: chat.type,
-              title: chat.title,
+            status: chat.data.status,
+            data: {
+              id: chat.data.data._id.toString(),
+              type: chat.data.data.type,
+              title: chat.data.data.title,
               fullInfo: {
-                members: chat.fullInfo.members.map((chatMember) => ({
+                members: chat.data.data.fullInfo.members.map((chatMember) => ({
                   userId: chatMember.userId.toString(),
                 })),
               },
-            })),
+            },
           },
         })),
       );

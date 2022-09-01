@@ -94,9 +94,9 @@ export class ChatsGateway {
   async onGetChats(
     @MessageBody() body: GetChatsDto,
       @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<WsResponse<ChatDocument[]>> {
+  ): Promise<WsResponse<{ chat: ChatDocument[], currentUserId: string }>> {
     const chats = (await this.chatsService.findByMembers([client.userId], {}, {
-      extended: body.extended,
+      extended: true,
       skip: body.page * body.count,
       limit: body.count,
     }));
@@ -105,7 +105,10 @@ export class ChatsGateway {
       event: 'get-chats',
       data: {
         status: true,
-        data: chats,
+        data: {
+          chat: chats,
+          currentUserId: client.userId,
+        },
       },
     };
   }

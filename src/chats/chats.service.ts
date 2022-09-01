@@ -47,11 +47,14 @@ export class ChatsService {
     members: Array<string>,
     additional: FilterQuery<ChatDocument> = {},
     options = { extended: false, skip: 0, limit: 10 },
-  ): Promise<Array<ChatDocument>> {
-    const result = await this.chatModel.find({ ...additional, 'fullInfo.members.userId': { $all: members } })
-      .skip(options.skip)
-      .limit(options.limit)
-      .exec();
+  ): Promise<ChatDocument[]> {
+    const result = (await ChatsService.cut<ChatDocument>(
+      this.chatModel.find({ ...additional, 'fullInfo.members.userId': { $all: members } })
+        .skip(options.skip)
+        .limit(options.limit),
+      options.extended,
+    )) as ChatDocument[];
+
     return result;
   }
 

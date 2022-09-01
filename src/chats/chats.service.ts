@@ -90,7 +90,7 @@ export class ChatsService {
       chat,
       { members: 1 },
     ).exec()).fullInfo.members
-      .findIndex((chatMember) => chatMember.userId.toString() === userId) !== -1;
+      ?.findIndex((chatMember) => chatMember.userId.toString() === userId) !== -1;
 
     return isAccess;
   }

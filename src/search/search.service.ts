@@ -36,25 +36,16 @@ export class SearchService {
   }
 
   async usersSearch(query: string, currentUserId: string): Promise<Array<ApiUserSearch>> {
-    const searchedUsers: ApiUserSearch[] = (await this.userService.search(query)).map((user) => {
-      // В дальнейшем можно будет проверять политику каждого пользователя на возможность его найти
-      if (currentUserId === user._id.toString()) {
-        return {
-          type: 'skip',
-        } as any;
-      }
-
-      return {
-        id: user._id.toString(),
-        type: user.type,
-        firstName: user.firstName,
-        lastName: user?.lastName,
-        userName: user?.userName,
-        isVerified: user?.isVerified,
-        lastActivity: user?.lastActivity,
-        externalAccounts: user?.externalAccounts,
-      };
-    }).filter((e) => e !== null);
+    const searchedUsers: ApiUserSearch[] = (await this.userService.search(query)).map((user) => ({
+      id: user._id.toString(),
+      type: user.type,
+      firstName: user.firstName,
+      lastName: user?.lastName,
+      userName: user?.userName,
+      isVerified: user?.isVerified,
+      lastActivity: user?.lastActivity,
+      externalAccounts: user?.externalAccounts,
+    }));
 
     try {
       const externalUsers = await this.searchUsersByExternalService(query);
@@ -66,25 +57,9 @@ export class SearchService {
         externalUsers.forEach((externalUser) => {
           // Тут опасно, надо включить проверку на null
           const localUserFindResult = searchedUsers.find(
-            (localUser) => {
-              // @ts-ignore
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-              if (localUser.type === 'skip') {
-                return true;
-              }
-
-              // @ts-ignore
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-              if (Array.isArray(localUser.externalAccounts)) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-                return localUser.externalAccounts
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                  .find((externalAccount) => (externalAccount.service === 'volsu'
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    && externalAccount.id === externalUser.id));
-              }
-              return false;
-            },
+            (localUser) => (Array.isArray(localUser.externalAccounts) ? localUser.externalAccounts
+              .find((externalAccount) => externalAccount.service === 'volsu'
+                && externalAccount.id === externalUser.id) : false),
           );
           if (!localUserFindResult) {
             searchedUsers.push({
@@ -99,6 +74,7 @@ export class SearchService {
       this.logger.log(e);
     }
 
-    return searchedUsers;
+    // В дальнейшем можно будет проверять политику каждого пользователя на возможность его найти
+    return searchedUsers.filter((user) => user.id !== currentUserId);
   }
 }

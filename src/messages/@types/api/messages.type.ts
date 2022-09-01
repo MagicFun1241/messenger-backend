@@ -12,6 +12,14 @@ export interface ApiMessageForwardInfo {
 
 export interface ApiMessage {
   id: string;
+  chatId: string;
+  senderId?: string;
+  replyToChatId?: string;
+  replyToMessageId?: string;
+  replyToTopMessageId?: string;
+  date: Date;
+  isOutgoing: boolean;
+  sendingState?: 'messageSendingStatePending' | 'messageSendingStateFailed';
   content: {
     text?: string;
     // photo?: ApiPhoto;
@@ -21,13 +29,6 @@ export interface ApiMessage {
     // contact?: ApiContact;
     // poll?: ApiPoll;
   };
-  senderId?: string;
-  date: Date;
-  isOutgoing: boolean;
-  replyToChatId?: string;
-  replyToMessageId?: number;
-  replyToTopMessageId?: number;
-  sendingState?: 'messageSendingStatePending' | 'messageSendingStateFailed';
   forwardInfo?: ApiMessageForwardInfo;
   isDeleting?: boolean;
   previousLocalId?: number;

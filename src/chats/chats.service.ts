@@ -136,10 +136,12 @@ export class ChatsService {
     if (!foundedChat) {
       foundedChat = await this.chatModel.create({
         type: 'chatTypePrivate',
-        members: [
-          { userId: currentUserId },
-          { userId: foundedUserId },
-        ],
+        fullInfo: {
+          members: [
+            { userId: currentUserId },
+            { userId: foundedUserId },
+          ],
+        },
       });
     }
 

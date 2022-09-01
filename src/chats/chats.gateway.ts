@@ -12,6 +12,7 @@ import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 
+import { UserDocument } from '@/users/schemas/user.schema';
 import { ChatsService } from './chats.service';
 import { ChatDocument } from './schemas/chats.schema';
 import { ChatsApiFormattingInterceptor } from './interceptors/chats-api-formatting.interceptor';
@@ -68,7 +69,14 @@ export class ChatsGateway {
       throw new WsFormatException('Not found');
     }
 
-    const chat = (await this.chatsService.findById(body.id, { extended: body.extended })) as ChatDocument;
+    const chat = (await this.chatsService.findById(body.id, { extended: true })) as ChatDocument;
+    const chatTitle = chat.type === 'chatTypePrivate' || chat.type === 'chatTypeSecret'
+      ? chat.fullInfo.members
+        .find((chatMember) => chatMember.userId._id.toString() !== client.userId).userId as UserDocument
+      : undefined;
+    if (chatTitle) {
+      chat.title = `${chatTitle?.firstName} ${chatTitle?.lastName ? chatTitle?.lastName : ''}`;
+    }
 
     return {
       event: 'get-chat-by-id',

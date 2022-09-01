@@ -24,6 +24,7 @@ export class ChatsApiFormattingInterceptor implements NestInterceptor {
             data: {
               id: chat.data.data._id.toString(),
               type: chat.data.data.type,
+              title: chat.data.data.title,
               fullInfo: {
                 members: chat.data.data.fullInfo.members.map((chatMember) => ({
                   userId: chatMember.userId.toString(),

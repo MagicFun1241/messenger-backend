@@ -3,6 +3,7 @@ import {
 } from '@nestjs/mongoose';
 import { Document, ObjectId, Types } from 'mongoose';
 import { Timestamps } from '@/@types/mongoose';
+import { UserDocument } from '@/users/schemas/user.schema';
 
 // TODO: Оставить одно определение
 export type ChatType = (
@@ -20,7 +21,8 @@ export enum ChatTypeEnum {
 }
 
 export interface ChatMember {
-  userId: Types.ObjectId;
+  userId: Types.ObjectId | UserDocument
+  ;
   joinedDate?: Date;
   inviterId?: Types.ObjectId;
   kickedByUserId?: Types.ObjectId;

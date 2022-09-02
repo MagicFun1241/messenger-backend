@@ -6,9 +6,8 @@ import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 
 import { UsersGateway } from '../users.gateway';
 import { UsersService } from '../users.service';
-import { User } from '../schemas/user.schema';
+import { User, UserDocument } from '../schemas/user.schema';
 import { userStub } from './stubs/user.stub';
-import { ApiUser } from '../@types/api/users.types';
 
 jest.mock('../users.service');
 
@@ -35,7 +34,7 @@ describe('UsersGateway', () => {
 
   describe('findById', () => {
     describe('When findById is called', () => {
-      let user: WsResponse<ApiUser>;
+      let user: WsResponse<UserDocument>;
 
       beforeEach(async () => {
         user = await usersGateway.findOneUserHandler({
@@ -44,7 +43,7 @@ describe('UsersGateway', () => {
       });
 
       test('then is should param _id equal return _id', () => {
-        expect(user.data.data.id).toEqual(userStub()._id);
+        expect(user.data.data._id).toEqual(userStub()._id);
       });
     });
   });

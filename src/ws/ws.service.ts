@@ -27,6 +27,12 @@ export class WsService {
     return id;
   }
 
+  public emitToAllUserSessions(userId: string, data: any) {
+    this.webSocketState.get(userId)?.forEach((item) => {
+      item.client.send(data);
+    });
+  }
+
   public deleteConnectedWebSocketByUserIdAndClientId(userId: string, clientId: string) {
     const connections = this.webSocketState.get(userId);
 

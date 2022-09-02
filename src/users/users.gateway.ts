@@ -1,4 +1,6 @@
-import { Logger, UseFilters, UseGuards } from '@nestjs/common';
+import {
+  Logger, UseFilters, UseGuards, UseInterceptors,
+} from '@nestjs/common';
 
 import {
   WebSocketGateway, SubscribeMessage, MessageBody, ConnectedSocket,
@@ -13,14 +15,13 @@ import { WsFilterException } from '@/ws/exceptions/ws.filter.exception';
 import { WsResponse } from '@/ws/interfaces/ws.response.interface';
 import { AuthWsJwtGuard } from '@/authentication/guards/auth.ws-jwt.guard';
 import { PrivateCreateUser } from '@/users/dto/privateCreateUser';
+import { UserApiFormattingInterceptor } from '@/names/interceptors/user-api-formatting.interceptor';
+import { UserDocument } from '@/users/schemas/user.schema';
 import { UsersService } from './users.service';
 
 import { UpdateMeDto } from './dto/updateMe.dto';
 import { FindByQueryDto } from './dto/findByQuery.dto';
 import { GetUserByIdDto } from './dto/get-user-by-id.dto';
-
-import { UserItem } from './@types/users.types';
-import { ApiUser } from './@types/api/users.types';
 
 @UseFilters(WsFilterException)
 @UseGuards(AuthWsJwtGuard)
@@ -55,7 +56,7 @@ export class UsersGateway {
   @SubscribeMessage('get-user-by-id')
   async findOneUserHandler(
     @MessageBody() body: GetUserByIdDto,
-  ): Promise<WsResponse<ApiUser>> {
+  ): Promise<WsResponse<UserDocument>> {
     const user = await this.usersService.findById(body.id);
     if (!user) {
       throw new WsFormatException({ event: 'get-user-by-id', message: 'User not found' });
@@ -65,29 +66,25 @@ export class UsersGateway {
       event: 'get-user-by-id',
       data: {
         status: true,
-        data: {
-          id: user._id.toString(),
-          type: user.type,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          tags: user.tags,
-        },
+        data: user,
       },
     };
   }
 
-  @SubscribeMessage('findMe')
-  async findMe(
+  @UseInterceptors(UserApiFormattingInterceptor)
+  @SubscribeMessage('get-me')
+  async findCurrent(
     @ConnectedSocket() client: WebSocketEntity,
-  ): Promise<UserItem> {
+  ): Promise<WsResponse<UserDocument>> {
     const me = await this.usersService.findById(client.userId);
 
     // TODO: Реализовать когда-нибудь двухфакторную аутентификацию
     return {
-      id: me._id.toString(),
-      firstName: me.firstName,
-      lastName: me.lastName,
-      tags: me.tags,
+      event: 'get-me',
+      data: {
+        status: true,
+        data: me,
+      },
     };
   }
 

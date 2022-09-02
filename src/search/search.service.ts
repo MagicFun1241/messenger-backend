@@ -7,6 +7,7 @@ import { UsersService } from '@/users/users.service';
 import { ExternalServiceApiResponse } from '@/@types/externalService';
 import { UserExternal } from '@/users/@types/usersExternal.types';
 import { ApiUserSearch } from '@/users/@types/api/users.types';
+import { ChatsService } from '@/chats/chats.service';
 
 @Injectable()
 export class SearchService {
@@ -15,6 +16,7 @@ export class SearchService {
   constructor(
     private readonly configService: ConfigService,
     private readonly userService: UsersService,
+    private readonly chatsService: ChatsService,
   ) {}
 
   private async searchUsersByExternalService(query: string): Promise<Pick<UserExternal, 'id' | 'firstName'>[]> {
@@ -62,11 +64,12 @@ export class SearchService {
                 && externalAccount.id === externalUser.id) : false),
           );
           if (!localUserFindResult) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
             searchedUsers.push({
               type: 'userTypeUnLinked',
               firstName: externalUser.firstName,
               externalAccounts: [{ id: externalUser.id, service: 'volsu' }],
-            });
+            } as any);
           }
         });
       }

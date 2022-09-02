@@ -1,6 +1,6 @@
-import { INestApplicationContext, Logger } from '@nestjs/common';
+import {CustomDecorator, INestApplicationContext, Logger} from '@nestjs/common';
 import { loadPackage } from '@nestjs/common/utils/load-package.util';
-import { AbstractWsAdapter } from '@nestjs/websockets';
+import {AbstractWsAdapter, SubscribeMessage} from '@nestjs/websockets';
 import {
   CLOSE_EVENT,
   CONNECTION_EVENT,
@@ -13,6 +13,7 @@ import {
   filter, first, mergeMap, share, takeUntil,
 } from 'rxjs/operators';
 import { pack, unpack } from 'msgpackr';
+import {MessageMetaData} from "@/ws/ws.message-meta-data.decorator";
 
 let wsPackage: any = {};
 

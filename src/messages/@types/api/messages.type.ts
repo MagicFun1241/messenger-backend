@@ -1,3 +1,7 @@
+export interface ApiChatContent {
+  text?: string,
+}
+
 export interface ApiMessageForwardInfo {
   date: Date;
   isChannelPost: boolean;
@@ -20,15 +24,16 @@ export interface ApiMessage {
   date: Date;
   isOutgoing: boolean;
   sendingState?: 'messageSendingStatePending' | 'messageSendingStateFailed';
-  content: {
-    text?: string;
-    // photo?: ApiPhoto;
-    // video?: ApiVideo;
-    // document?: ApiDocument;
-    // sticker?: ApiSticker;
-    // contact?: ApiContact;
-    // poll?: ApiPoll;
-  };
+  content: ApiChatContent;
+  // content: {
+  //   text?: string;
+  //   photo?: ApiPhoto;
+  //   video?: ApiVideo;
+  //   document?: ApiDocument;
+  //   sticker?: ApiSticker;
+  //   contact?: ApiContact;
+  //   poll?: ApiPoll;
+  // };
   forwardInfo?: ApiMessageForwardInfo;
   isDeleting?: boolean;
   previousLocalId?: number;

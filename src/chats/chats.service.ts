@@ -17,7 +17,7 @@ export class ChatsService {
   private readonly logger = new Logger(ChatsService.name);
 
   constructor(
-    @InjectModel(Chat.name) private chatModel: Model<ChatDocument>,
+    @InjectModel(Chat.name) private ChatModel: Model<ChatDocument>,
     private readonly usersService: UsersService,
   ) {}
 
@@ -37,9 +37,19 @@ export class ChatsService {
     extended?: boolean;
   } = { extended: false }) {
     const result = await ChatsService.cut<ChatDocument>(
-      this.chatModel.findById(id),
+      this.ChatModel.findById(id),
       options.extended,
     );
+    return result;
+  }
+
+  async countChatsByMembers(
+    members: Array<string>,
+  ): Promise<number> {
+    const result = await this.ChatModel
+      .countDocuments({ 'fullInfo.members.userId': { $all: members } })
+      .exec();
+
     return result;
   }
 
@@ -49,7 +59,7 @@ export class ChatsService {
     options = { extended: false, skip: 0, limit: 10 },
   ): Promise<ChatDocument[]> {
     const result = (await ChatsService.cut<ChatDocument>(
-      this.chatModel.find({ ...additional, 'fullInfo.members.userId': { $all: members } })
+      this.ChatModel.find({ ...additional, 'fullInfo.members.userId': { $all: members } })
         .skip(options.skip)
         .limit(options.limit),
       options.extended,
@@ -72,11 +82,11 @@ export class ChatsService {
   // }
 
   async updateName(id: string, value: string) {
-    await this.chatModel.updateOne({ _id: id }, { $set: { name: value } }).exec();
+    await this.ChatModel.updateOne({ _id: id }, { $set: { name: value } }).exec();
   }
 
   async exists(id: string) {
-    return this.chatModel.exists({ _id: id }).exec();
+    return this.ChatModel.exists({ _id: id }).exec();
   }
 
   // async existsWithMembers(members: Array<string>) {
@@ -84,12 +94,12 @@ export class ChatsService {
   // }
 
   async extractConversationType(id: string) {
-    const c = await this.chatModel.findById(id, { type: 1 });
+    const c = await this.ChatModel.findById(id, { type: 1 });
     return c.type;
   }
 
   async hasAccess(chat: string, userId: string): Promise<boolean> {
-    const isAccess = (await this.chatModel.findById(
+    const isAccess = (await this.ChatModel.findById(
       chat,
       { members: 1 },
     ).exec()).fullInfo.members
@@ -137,7 +147,7 @@ export class ChatsService {
     );
 
     if (!foundedChat) {
-      foundedChat = await this.chatModel.create({
+      foundedChat = await this.ChatModel.create({
         type: 'chatTypePrivate',
         fullInfo: {
           members: [

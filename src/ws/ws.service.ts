@@ -10,6 +10,9 @@ export class WsService {
    * */
   private webSocketState = new Map<string, WsStateValueInterface[]>();
 
+  // Пользователи, события которых мы будем отправлять
+  private hotUsers = new Map<string, Set<string>>();
+
   public getConnectedWebSocketsByUserId(userId: string): WsStateValueInterface[] | undefined {
     const webSockets = this.webSocketState.get(userId);
     return webSockets;
@@ -25,6 +28,25 @@ export class WsService {
     this.webSocketState.get(userId).push({ id, client: webSocket });
 
     return id;
+  }
+
+  public emitHotUsers(userId: string, data: any) {
+    if (!this.hotUsers.has(userId)) {
+      return;
+    }
+
+    const list = this.hotUsers.get(userId);
+    list.forEach((v) => {
+      this.emitToAllUserSessions(v, data);
+    });
+  }
+
+  public addHotUser(selfId: string, userId: string) {
+    if (!this.hotUsers.has(selfId)) {
+      this.hotUsers.set(selfId, new Set());
+    }
+
+    this.hotUsers.get(selfId).add(userId);
   }
 
   public emitToAllUserSessions(userId: string, data: any) {

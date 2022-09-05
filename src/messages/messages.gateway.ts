@@ -28,47 +28,47 @@ export class MessagesGateway {
     private readonly chatsService: ChatsService,
   ) {}
 
-  // @SubscribeMessage('getMessagesByConversation')
-  // async getList(
-  //   @MessageBody() body: GetMessagesDto,
-  //     @ConnectedSocket() client: WebSocketEntity,
-  // ): Promise<Array<MessageItem>> {
-  //   const hasAccess = await this.chatsService.hasAccess(body.conversation, client.userId);
-  //   if (!hasAccess) {
-  //     throw new WsFormatException('Conversation not found');
-  //   }
-  //
-  //   body.count = body.count || 10;
-  //   body.page = body.page || 1;
-  //
-  //   const items = await this.messagesService.find({
-  //     conversation: body.conversation,
-  //   }, {
-  //     offset: body.page * body.count,
-  //     count: body.count,
-  //   });
-  //
-  //   return items.map((e) => ({
-  //     id: e._id.toString(),
-  //     text: e.text,
-  //     sender: e.sender._id.toString(),
-  //   }));
-  // }
-  //
-  // @SubscribeMessage('postMessageToGroup')
-  // async postMessageToGroup(
-  // @MessageBody() body: CreateMessageWithConversationDto,
-  //   @ConnectedSocket() client: WebSocketEntity,
-  // ) {
-  //   const hasAccess = await this.chatsService.hasAccess(body.conversation, client.userId);
-  //   if (!hasAccess) {
-  //     throw new WsFormatException('Conversation not found');
-  //   }
-  //
-  //   const r = await this.create(body.conversation, client.userId, body);
-  //   return r;
-  // }
-  //
+  @SubscribeMessage('get-messages-by-conversation')
+  async getList(
+    @MessageBody() body: GetMessagesDto,
+      @ConnectedSocket() client: WebSocketEntity,
+  ): Promise<Array<MessageItem>> {
+    const hasAccess = await this.chatsService.hasAccess(body.conversation, client.userId);
+    if (!hasAccess) {
+      throw new WsFormatException('Conversation not found');
+    }
+
+    body.count = body.count || 10;
+    body.page = body.page || 1;
+
+    const items = await this.messagesService.find({
+      conversation: body.conversation,
+    }, {
+      offset: body.page * body.count,
+      count: body.count,
+    });
+
+    return items.map((e) => ({
+      id: e._id.toString(),
+      text: e.content.text,
+      sender: e.sender._id.toString(),
+    }));
+  }
+
+  @SubscribeMessage('postMessageToGroup')
+  async postMessageToGroup(
+  @MessageBody() body: CreateMessageWithConversationDto,
+    @ConnectedSocket() client: WebSocketEntity,
+  ) {
+    const hasAccess = await this.chatsService.hasAccess(body.conversation, client.userId);
+    if (!hasAccess) {
+      throw new WsFormatException('Conversation not found');
+    }
+
+    const r = await this.create(body.conversation, client.userId, body);
+    return r;
+  }
+
   // @SubscribeMessage('postMessageToDirect')
   // async postMessageToDirect(
   // @MessageBody() body: CreateMessageWithUserDto,
@@ -78,22 +78,26 @@ export class MessagesGateway {
   //   const r = await this.create(conversation.toString(), client.userId, body);
   //   return r;
   // }
-  //
-  // private async create(conversation: string, sender: string, data: CreateMessageDto) {
-  //   const doc: MessageDocument = {
-  //     sender,
-  //     conversation,
-  //   } as any;
-  //
-  //   if (data.text == null) {
-  //     throw new WsFormatException('Text must be passed');
-  //   }
-  //
-  //   const r = await this.messagesService.create(doc);
-  //   return {
-  //     id: r._id,
-  //   };
-  // }
+
+  private async create(chat: string, sender: string, data: CreateMessageDto) {
+    const doc: MessageDocument = {
+      sender,
+      chat,
+    } as any;
+
+    // if (data.text != null && data.something != null) {
+    //   throw new WsFormatException('Attachments of only one type is supported');
+    // }
+
+    if (data.text != null) {
+      doc.content.text = data.text;
+    }
+
+    const r = await this.messagesService.create(doc);
+    return {
+      id: r._id,
+    };
+  }
   //
   // private async findDirectOrCreate(first: string, second: string) {
   //   const members = [first, second];

@@ -10,8 +10,6 @@ import {
   Chat, ChatDocument, ChatMember, ChatType, ChatTypeEnum,
 } from './schemas/chats.schema';
 
-import { ApiChat } from './@types/api/chats.type';
-
 import { GetChatByUserDto } from './dto/get-chat-by-user.dto';
 
 @Injectable()
@@ -60,12 +58,12 @@ export class ChatsService {
     additional: FilterQuery<ChatDocument> = {},
     options = { extended: false, skip: 0, limit: 10 },
   ): Promise<ChatDocument[]> {
-    const result = (await ChatsService.cut<ChatDocument[]>(
+    const result = await ChatsService.cut<ChatDocument[]>(
       this.ChatModel.find({ ...additional, 'fullInfo.members.userId': { $all: members } })
         .skip(options.skip)
         .limit(options.limit),
       options.extended,
-    ));
+    );
 
     return result;
   }

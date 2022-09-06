@@ -6,7 +6,9 @@ import { UsersService } from '@/users/users.service';
 
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 
-import { Chat, ChatDocument } from './schemas/chats.schema';
+import {
+  Chat, ChatDocument, ChatMember, ChatType, ChatTypeEnum,
+} from './schemas/chats.schema';
 
 import { ApiChat } from './@types/api/chats.type';
 
@@ -68,18 +70,18 @@ export class ChatsService {
     return result;
   }
 
-  // async create(creator: string, data: {
-  //   type: ConversationType;
-  //   members: ChatMember[];
-  // }) {
-  //   return this.conversationModel.create({
-  //     ...data,
-  //     roles: data.type === ConversationType.group ? [{
-  //       user: creator,
-  //       role: Role.creator,
-  //     }] : undefined,
-  //   });
-  // }
+  async create(creator: string, data: {
+    type: ChatType;
+    members: ChatMember[];
+  }) {
+    return this.ChatModel.create({
+      ...data,
+      // roles: data.type !== ChatTypeEnum.chatTypePrivate ? [{
+      //   user: creator,
+      //   role: Role.creator,
+      // }] : undefined,
+    });
+  }
 
   async updateName(id: string, value: string) {
     await this.ChatModel.updateOne({ _id: id }, { $set: { name: value } }).exec();
@@ -89,9 +91,12 @@ export class ChatsService {
     return this.ChatModel.exists({ _id: id }).exec();
   }
 
-  // async existsWithMembers(members: Array<string>) {
-  //   return this.conversationModel.exists({ type: ConversationType.direct, members }).exec();
-  // }
+  async existsWithMembers(members: Array<ChatMember>) {
+    return this.ChatModel.exists({
+      type: ChatTypeEnum.chatTypePrivate,
+      'members.userId': { $in: members.map((e) => e.userId) },
+    }).exec();
+  }
 
   async extractConversationType(id: string) {
     const c = await this.ChatModel.findById(id, { type: 1 });

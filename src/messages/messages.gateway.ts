@@ -12,6 +12,7 @@ import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { MessageDocument } from '@/messages/schemas/message.schema';
 import { ChatsService } from '@/chats/chats.service';
 import { GetMessagesDto } from '@/messages/dto/getList';
+import { ChatMember, ChatTypeEnum } from '@/chats/schemas/chats.schema';
 
 interface MessageItem {
   id: string;
@@ -55,7 +56,7 @@ export class MessagesGateway {
     }));
   }
 
-  @SubscribeMessage('postMessageToGroup')
+  @SubscribeMessage('post-message-to-group')
   async postMessageToGroup(
   @MessageBody() body: CreateMessageWithConversationDto,
     @ConnectedSocket() client: WebSocketEntity,
@@ -69,15 +70,15 @@ export class MessagesGateway {
     return r;
   }
 
-  // @SubscribeMessage('postMessageToDirect')
-  // async postMessageToDirect(
-  // @MessageBody() body: CreateMessageWithUserDto,
-  //   @ConnectedSocket() client: WebSocketEntity,
-  // ) {
-  //   const conversation = await this.findDirectOrCreate(client.userId, body.user);
-  //   const r = await this.create(conversation.toString(), client.userId, body);
-  //   return r;
-  // }
+  @SubscribeMessage('post-message-to-direct')
+  async postMessageToDirect(
+  @MessageBody() body: CreateMessageWithUserDto,
+    @ConnectedSocket() client: WebSocketEntity,
+  ) {
+    const conversation = await this.findDirectOrCreate(client.userId, body.user);
+    const r = await this.create(conversation.toString(), client.userId, body);
+    return r;
+  }
 
   private async create(chat: string, sender: string, data: CreateMessageDto) {
     const doc: MessageDocument = {
@@ -98,16 +99,16 @@ export class MessagesGateway {
       id: r._id,
     };
   }
-  //
-  // private async findDirectOrCreate(first: string, second: string) {
-  //   const members = [first, second];
-  //
-  //   try {
-  //     const d = await this.chatsService.existsWithMembers(members);
-  //     return d._id;
-  //   } catch (e) {
-  //     const d = await this.chatsService.create(first, { type: ConversationType.direct, members });
-  //     return d._id;
-  //   }
-  // }
+
+  private async findDirectOrCreate(first: string, second: string) {
+    const members: Array<ChatMember> = [{ userId: first as any }, { userId: second as any }];
+
+    try {
+      const d = await this.chatsService.existsWithMembers(members);
+      return d._id;
+    } catch (e) {
+      const d = await this.chatsService.create(first, { type: ChatTypeEnum.chatTypePrivate, members });
+      return d._id;
+    }
+  }
 }

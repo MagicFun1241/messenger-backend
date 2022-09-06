@@ -1,5 +1,18 @@
+interface PhotoAttachment {
+  type: 'photo',
+  file: string;
+}
+
+interface DocumentAttachment {
+  type: 'document',
+  file: string;
+}
+
+export type Attachment = PhotoAttachment | DocumentAttachment;
+
 export interface ApiChatContent {
   text?: string,
+  attachments?: Array<Attachment>;
 }
 
 export interface ApiMessageForwardInfo {
@@ -25,15 +38,6 @@ export interface ApiMessage {
   isOutgoing: boolean;
   sendingState?: 'messageSendingStatePending' | 'messageSendingStateFailed';
   content: ApiChatContent;
-  // content: {
-  //   text?: string;
-  //   photo?: ApiPhoto;
-  //   video?: ApiVideo;
-  //   document?: ApiDocument;
-  //   sticker?: ApiSticker;
-  //   contact?: ApiContact;
-  //   poll?: ApiPoll;
-  // };
   forwardInfo?: ApiMessageForwardInfo;
   isDeleting?: boolean;
   previousLocalId?: number;

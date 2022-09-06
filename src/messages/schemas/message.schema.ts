@@ -23,7 +23,15 @@ export class Message {
     replyToChat?: ChatDocument;
 
   @Prop(raw({
-    text: { type: String },
+    text: {
+      type: String,
+    },
+    attachments: [
+      raw({
+        type: String,
+        file: String,
+      }),
+    ],
   }))
     content: ApiChatContent;
 }

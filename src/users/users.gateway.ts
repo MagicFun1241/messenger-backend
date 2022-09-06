@@ -88,24 +88,11 @@ export class UsersGateway {
     };
   }
 
-  @SubscribeMessage('updateMe')
+  @SubscribeMessage('update-me')
   async updateMe(
   @MessageBody() body: UpdateMeDto,
     @ConnectedSocket() client: WebSocketEntity,
   ) {
     return {};
-  }
-
-  @SubscribeMessage('findUsersByQuery')
-  async search(
-  @MessageBody() body: FindByQueryDto,
-  ) {
-    const r = await this.usersService.search(body.query, body.tags);
-    return r.map((e) => ({
-      id: e._id,
-      firstName: e.firstName,
-      lastName: e.lastName,
-      tags: e.tags,
-    }));
   }
 }

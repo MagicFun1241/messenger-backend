@@ -88,28 +88,30 @@ export class MessagesGateway {
       chat,
     } as any;
 
+    if (data.text == null && (data.attachments == null || data.attachments.length === 0)) {
+      throw new WsFormatException('Attachments of only one type is supported');
+    }
+
     const c = await this.chatsService.findById(chat);
-    c.fullInfo.members.forEach((member) => {
-      this.wsService.emitToAllUserSessions(member.userId.toString(), {
-        event: 'message-new',
-        data: {
-          sender,
-          chat,
-          text: data.text,
-        },
-      });
-    });
-    // if (data.text != null && data.something != null) {
-    //   throw new WsFormatException('Attachments of only one type is supported');
-    // }
 
     if (data.text != null) {
       doc.content.text = data.text;
     }
 
     const r = await this.messagesService.create(doc);
+    c.fullInfo.members.forEach((member) => {
+      this.wsService.emitToAllUserSessions(member.userId.toString(), {
+        event: 'message-new',
+        data: {
+          id: r._id.toString(),
+          sender,
+          chat,
+          text: data.text,
+        },
+      });
+    });
     return {
-      id: r._id,
+      id: r._id.toString(),
     };
   }
 

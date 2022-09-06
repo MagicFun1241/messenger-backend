@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
 import { WebSocketEntity } from './entities/ws.web-socket.entity';
 import { WsStateValueInterface } from './interfaces/ws.state-value.interface';
+import {pack} from "msgpackr";
 
 @Injectable()
 export class WsService {
@@ -51,7 +52,7 @@ export class WsService {
 
   public emitToAllUserSessions(userId: string, data: any) {
     this.webSocketState.get(userId)?.forEach((item) => {
-      item.client.send(data);
+      item.client.send(pack(data));
     });
   }
 

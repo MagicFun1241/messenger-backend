@@ -12,6 +12,8 @@ import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { MessageDocument } from '@/messages/schemas/message.schema';
 import { ChatsService } from '@/chats/chats.service';
 import { GetMessagesDto } from '@/messages/dto/getList';
+import { ChatMember, ChatTypeEnum } from '@/chats/schemas/chats.schema';
+import { WsService } from '@/ws/ws.service';
 
 interface MessageItem {
   id: string;
@@ -26,6 +28,7 @@ export class MessagesGateway {
   constructor(
     private readonly messagesService: MessagesService,
     private readonly chatsService: ChatsService,
+    private readonly wsService: WsService,
   ) {}
 
   @SubscribeMessage('get-messages-by-conversation')
@@ -55,7 +58,7 @@ export class MessagesGateway {
     }));
   }
 
-  @SubscribeMessage('postMessageToGroup')
+  @SubscribeMessage('post-message-to-group')
   async postMessageToGroup(
   @MessageBody() body: CreateMessageWithConversationDto,
     @ConnectedSocket() client: WebSocketEntity,
@@ -69,15 +72,15 @@ export class MessagesGateway {
     return r;
   }
 
-  // @SubscribeMessage('postMessageToDirect')
-  // async postMessageToDirect(
-  // @MessageBody() body: CreateMessageWithUserDto,
-  //   @ConnectedSocket() client: WebSocketEntity,
-  // ) {
-  //   const conversation = await this.findDirectOrCreate(client.userId, body.user);
-  //   const r = await this.create(conversation.toString(), client.userId, body);
-  //   return r;
-  // }
+  @SubscribeMessage('post-message-to-direct')
+  async postMessageToDirect(
+  @MessageBody() body: CreateMessageWithUserDto,
+    @ConnectedSocket() client: WebSocketEntity,
+  ) {
+    const conversation = await this.findDirectOrCreate(client.userId, body.user);
+    const r = await this.create(conversation.toString(), client.userId, body);
+    return r;
+  }
 
   private async create(chat: string, sender: string, data: CreateMessageDto) {
     const doc: MessageDocument = {
@@ -85,6 +88,17 @@ export class MessagesGateway {
       chat,
     } as any;
 
+    const c = await this.chatsService.findById(chat);
+    c.fullInfo.members.forEach((member) => {
+      this.wsService.emitToAllUserSessions(member.userId.toString(), {
+        event: 'message-new',
+        data: {
+          sender,
+          chat,
+          text: data.text,
+        },
+      });
+    });
     // if (data.text != null && data.something != null) {
     //   throw new WsFormatException('Attachments of only one type is supported');
     // }
@@ -98,16 +112,16 @@ export class MessagesGateway {
       id: r._id,
     };
   }
-  //
-  // private async findDirectOrCreate(first: string, second: string) {
-  //   const members = [first, second];
-  //
-  //   try {
-  //     const d = await this.chatsService.existsWithMembers(members);
-  //     return d._id;
-  //   } catch (e) {
-  //     const d = await this.chatsService.create(first, { type: ConversationType.direct, members });
-  //     return d._id;
-  //   }
-  // }
+
+  private async findDirectOrCreate(first: string, second: string) {
+    const members: Array<ChatMember> = [{ userId: first as any }, { userId: second as any }];
+
+    try {
+      const d = await this.chatsService.existsWithMembers(members);
+      return d._id;
+    } catch (e) {
+      const d = await this.chatsService.create(first, { type: ChatTypeEnum.chatTypePrivate, members });
+      return d._id;
+    }
+  }
 }

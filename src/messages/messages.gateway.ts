@@ -5,15 +5,16 @@ import { MessagesService } from '@/messages/messages.service';
 import { WebSocketEntity } from '@/ws/entities/ws.web-socket.entity';
 import {
   CreateMessageDto,
-  CreateMessageWithConversationDto,
+  CreateMessageWithChatDto,
   CreateMessageWithUserDto,
-} from '@/messages/dto/createMessage';
+} from '@/messages/dto/create.dto';
 import { WsFormatException } from '@/ws/exceptions/ws.format.exception';
 import { MessageDocument } from '@/messages/schemas/message.schema';
 import { ChatsService } from '@/chats/chats.service';
-import { GetMessagesDto } from '@/messages/dto/getList';
+import { GetMessagesDto } from '@/messages/dto/get-list.dto';
 import { ChatMember, ChatTypeEnum } from '@/chats/schemas/chats.schema';
 import { WsService } from '@/ws/ws.service';
+import { UpdateMessageDto } from '@/messages/dto/update.dto';
 
 interface MessageItem {
   id: string;
@@ -60,15 +61,15 @@ export class MessagesGateway {
 
   @SubscribeMessage('post-message-to-group')
   async postMessageToGroup(
-  @MessageBody() body: CreateMessageWithConversationDto,
+  @MessageBody() body: CreateMessageWithChatDto,
     @ConnectedSocket() client: WebSocketEntity,
   ) {
-    const hasAccess = await this.chatsService.hasAccess(body.conversation, client.userId);
+    const hasAccess = await this.chatsService.hasAccess(body.chat, client.userId);
     if (!hasAccess) {
       throw new WsFormatException('Conversation not found');
     }
 
-    const r = await this.create(body.conversation, client.userId, body);
+    const r = await this.create(body.chat, client.userId, body);
     return r;
   }
 
@@ -77,9 +78,55 @@ export class MessagesGateway {
   @MessageBody() body: CreateMessageWithUserDto,
     @ConnectedSocket() client: WebSocketEntity,
   ) {
-    const conversation = await this.findDirectOrCreate(client.userId, body.user);
-    const r = await this.create(conversation.toString(), client.userId, body);
+    const chat = await this.findDirectOrCreate(client.userId, body.user);
+    const r = await this.create(chat.toString(), client.userId, body);
     return r;
+  }
+
+  @SubscribeMessage('update-message')
+  async updateMessage(
+  @MessageBody() body: UpdateMessageDto,
+    @ConnectedSocket() client: WebSocketEntity,
+  ) {
+    if (body.text == null && (body.attachments == null || body.attachments.length === 0)) {
+      throw new WsFormatException('No fields to update');
+    }
+
+    const o = await this.messagesService.findById(body.id);
+    const chatId = o.chat._id.toString();
+    const hasAccess = await this.chatsService.hasAccess(chatId, client.userId);
+    if (!hasAccess) {
+      throw new WsFormatException('Access denied');
+    }
+
+    let modified = 0;
+
+    if (body.text != null) {
+      o.content.text = body.text;
+      modified += 1;
+    }
+
+    if (modified > 0) {
+      await o.save();
+
+      const chat = await this.chatsService.findById(chatId);
+
+      chat.fullInfo.members.forEach((member) => {
+        this.wsService.emitToAllUserSessions(member.userId.toString(), {
+          event: 'message-update',
+          data: {
+            id: body.id,
+            chat: chatId,
+            text: o.content.text,
+            attachments: o.content.attachments,
+          },
+        });
+      });
+    }
+
+    return {
+      modified,
+    };
   }
 
   private async create(chat: string, sender: string, data: CreateMessageDto) {

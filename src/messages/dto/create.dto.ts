@@ -13,9 +13,9 @@ export class CreateMessageDto {
     attachments?: Array<Attachment>;
 }
 
-export class CreateMessageWithConversationDto extends CreateMessageDto {
+export class CreateMessageWithChatDto extends CreateMessageDto {
   @IsString()
-    conversation: string;
+    chat: string;
 }
 
 export class CreateMessageWithUserDto extends CreateMessageDto {

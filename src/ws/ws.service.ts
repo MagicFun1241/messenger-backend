@@ -1,8 +1,8 @@
 import { randomUUID } from 'crypto';
 import { Injectable } from '@nestjs/common';
+import { pack } from 'msgpackr';
 import { WebSocketEntity } from './entities/ws.web-socket.entity';
 import { WsStateValueInterface } from './interfaces/ws.state-value.interface';
-import {pack} from "msgpackr";
 
 @Injectable()
 export class WsService {
